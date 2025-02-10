@@ -1,4 +1,4 @@
-package com.ra.inventory_management.Controller;
+package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
 import com.ra.inventory_management.model.entity.Categories;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 @RestController

@@ -1,4 +1,4 @@
-package com.ra.inventory_management.Controller;
+package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.model.dto.request.PasswordRequest;
 import com.ra.inventory_management.model.entity.Users;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ import java.io.IOException;
 
 
 
-@Controller
+@RestController
 @RequestMapping("/user/account")
 public class AccountController {
     @Value("${path-upload}")

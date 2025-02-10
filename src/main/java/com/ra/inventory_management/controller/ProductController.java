@@ -1,4 +1,4 @@
-package com.ra.inventory_management.Controller;
+package com.ra.inventory_management.controller;
 
 
 import com.ra.inventory_management.model.dto.request.ProductRequest;
@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
 
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -26,7 +25,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-@Controller
+@RestController
 @RequestMapping("/")
 public class ProductController {
     @Value("${path-upload}")

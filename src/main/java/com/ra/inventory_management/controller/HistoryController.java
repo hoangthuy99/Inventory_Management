@@ -1,4 +1,4 @@
-package com.ra.inventory_management.Controller;
+package com.ra.inventory_management.controller;
 
 public class HistoryController {
 }
