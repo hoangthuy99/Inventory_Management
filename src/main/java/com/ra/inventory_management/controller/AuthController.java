@@ -1,4 +1,4 @@
-package com.ra.inventory_management.Controller;
+package com.ra.inventory_management.controller;
 
 
 import com.ra.inventory_management.model.dto.request.UserRegister;
@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +22,7 @@ import java.util.Comparator;
 
 
 
-@Controller
+@RestController
 @RequestMapping("/app/category")
 public class AuthController {
 
