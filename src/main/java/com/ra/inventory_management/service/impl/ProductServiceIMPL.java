@@ -43,10 +43,13 @@ public class ProductServiceIMPL implements ProductService {
         // Tạo mới đối tượng Product và lưu vào database
         ProductInfo product = new ProductInfo();
         product.setName(productRequest.getName());
+        product.setCode(productRequest.getCode());
         product.setDescription(productRequest.getDescription());
+        product.setImg(productRequest.getImage());
+        product.setActiveFlag(productRequest.getActiveFlag() != null ? productRequest.getActiveFlag() : 1);
 
         Categories category = categoryRepository.findById(productRequest.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
+                .orElseThrow(() -> new IllegalArgumentException("ID danh mục không hợp lệ"));
         product.setCategories(category);
         product.setImg(productRequest.getImage());
 
@@ -64,12 +67,7 @@ public class ProductServiceIMPL implements ProductService {
     }
 
     @Override
-    public List<ProductInfo> getByNameOrDes(String name, String description) {
-        return productRepository.findByNameOrDescription(name, description);
-    }
-
-    @Override
-    public Page<ProductInfo> getByCategoryStatus(Pageable pageable, Integer activeFlag) {
+    public Page<ProductInfo> getByCategoryActiveFlag(Pageable pageable, Integer activeFlag) {
         return productRepository.findByCategoriesAndActiveFlag(pageable, activeFlag);
     }
 
