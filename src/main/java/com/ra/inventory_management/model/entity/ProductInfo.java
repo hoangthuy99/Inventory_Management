@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -53,6 +56,11 @@ public class ProductInfo {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
+    @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<History> histories = new HashSet<>();
+
+    @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ProductInStock> productInStocks = new HashSet<>();
 
 
 }

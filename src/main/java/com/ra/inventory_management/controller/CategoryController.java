@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
 @RestController
 @RequestMapping("/app/category")
 public class CategoryController {
@@ -46,31 +49,57 @@ public class CategoryController {
         }
     }
 
-    //    update status
-    @GetMapping("/category/status/{id}")
-    public String updateStatus(@PathVariable("id") Long id) {
+    @PutMapping("/{id}/activeFlag")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, Integer> requestBody) {
         Categories category = categoryService.findById(id);
+        if (category == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
+        }
+
+        Integer newActiveFlag = requestBody.get("activeFlag");
+        if (newActiveFlag == null) {
+            return ResponseEntity.badRequest().body("Thiếu giá trị activeFlag");
+        }
+
+        category.setActiveFlag(newActiveFlag);
         categoryService.save(category);
-        return "redirect:/admin/category";
+        return ResponseEntity.ok(category);
     }
 
-    //  edit Category
-    @GetMapping("/category/edit-category/{id}")
-    public String edit(Model model, @PathVariable("id") Long id) {
+    // ✅ API lấy danh mục theo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
         Categories category = categoryService.findById(id);
-        model.addAttribute("category", category);
-        return "/admin/category/edit-category";
+        if (category == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
+        }
+        return ResponseEntity.ok(category);
     }
 
-    @PostMapping("/category/edit-category")
-    public String update(@ModelAttribute("category") Categories category) {
-        categoryService.save(category);
-        return "redirect:/admin/category";
+    // ✅ API cập nhật danh mục
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest) {
+        Categories existingCategory = categoryService.findById(id);
+        if (existingCategory == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
+        }
+
+        existingCategory.setName(categoryRequest.getName());
+        existingCategory.setDescription(categoryRequest.getDescription());
+        existingCategory.setActiveFlag(categoryRequest.getActiveFlag());
+
+        categoryService.save(existingCategory);
+        return ResponseEntity.ok(existingCategory);
     }
 
-    @GetMapping("/category/delete/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    // ✅ API xóa danh mục
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        Categories category = categoryService.findById(id);
+        if (category == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
+        }
         categoryService.delete(id);
-        return "redirect:/admin/category";
+        return ResponseEntity.ok("Category deleted successfully");
     }
 }

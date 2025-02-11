@@ -13,8 +13,7 @@ public interface ProductService {
     ProductInfo save(ProductRequest productRequest);
     ProductInfo findById(Long id);
     void delete(Long id);
-    List<ProductInfo> getByNameOrDes(String name, String description);
-    Page<ProductInfo> getByCategoryStatus(Pageable pageable, Integer activeFlag);
+    Page<ProductInfo> getByCategoryActiveFlag(Pageable pageable, Integer activeFlag);
 
     Page<ProductInfo> getByCategoryId(Long id, Pageable pageable);
 

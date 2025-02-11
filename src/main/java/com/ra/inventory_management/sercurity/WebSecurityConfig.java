@@ -1,6 +1,5 @@
 package com.ra.inventory_management.sercurity;
 
-import com.ra.inventory_management.model.entity.ERoles;
 import com.ra.inventory_management.sercurity.UserDetail.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,20 +30,20 @@ public class WebSecurityConfig {
                 authenticationProvider(authenticationProvider()).
                 authorizeHttpRequests(
                         (auth)->auth
-                                .requestMatchers("/*").permitAll()
-                                .requestMatchers("/categories/**").permitAll()
-                                .requestMatchers("/products/**").permitAll()
-                                .requestMatchers("/admin/**").hasAuthority(String.valueOf(ERoles.ROLE_ADMIN))
-                                .requestMatchers("/user/**").hasAuthority(String.valueOf(ERoles.ROLE_STAFF))
+                                .requestMatchers("/**").permitAll()
+//                                .requestMatchers("/categories/**").permitAll()
+//                                .requestMatchers("/products/**").permitAll()
+//                                .requestMatchers("/admin/**").hasAuthority(String.valueOf(ERoles.ROLE_ADMIN))
+//                                .requestMatchers("/user/**").hasAuthority(String.valueOf(ERoles.ROLE_STAFF))
                                 .anyRequest().authenticated()
                 )
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .successHandler(roleBasedAuthenticationSuccessHandler())
-                )
+//                .formLogin(login -> login
+//                        .loginPage("/login")
+//                        .loginProcessingUrl("/login")
+//                        .usernameParameter("username")
+//                        .passwordParameter("password")
+//                        .successHandler(roleBasedAuthenticationSuccessHandler())
+//                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
