@@ -1,11 +1,9 @@
-package com.ra.inventory_management.model.entity;
+package com.ra.inventory_management.model.entity.product;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor

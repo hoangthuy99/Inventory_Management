@@ -1,7 +1,7 @@
 package com.ra.inventory_management.sercurity.UserDetail;
 
-import com.ra.inventory_management.model.entity.Users;
-import com.ra.inventory_management.repository.UserRepository;
+import com.ra.inventory_management.model.entity.product.Users;
+import com.ra.inventory_management.reponsitory.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

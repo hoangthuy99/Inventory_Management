@@ -25,7 +25,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Xử lý ảnh với BufferedImage
+	implementation 'com.twelvemonkeys.imageio:imageio-core:3.6.4'
+	implementation 'net.coobird:thumbnailator:0.4.14'
+
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
@@ -36,6 +41,7 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()

@@ -1,7 +1,7 @@
 package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
-import com.ra.inventory_management.model.entity.Categories;
+import com.ra.inventory_management.model.entity.product.Categories;
 import com.ra.inventory_management.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +10,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/app/category")
@@ -35,17 +37,31 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    //  add Category
-    @PostMapping("/add-category")
-    public ResponseEntity<?> addCategory(@Valid @RequestBody CategoryRequest category) {
+    @PostMapping(value = "/add-category", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         try {
-            if (category.getActiveFlag() == null) {
-                category.setActiveFlag(1);
+            if (categoryRequest.getActiveFlag() == null) {
+                categoryRequest.setActiveFlag(1);
             }
+
+            // Chuyển đổi CategoryRequest thành Categories entity
+            Categories category = new Categories();
+            category.setName(categoryRequest.getName());
+            category.setCode(categoryRequest.getCode());
+            category.setDescription(categoryRequest.getDescription());
+            category.setActiveFlag(categoryRequest.getActiveFlag());
+
+            // Gọi service để lưu
             Categories savedCategory = categoryService.save(category);
-            return ResponseEntity.ok("Category added successfully");
+
+            // Trả về thông tin chi tiết danh mục đã thêm
+            return ResponseEntity.ok(savedCategory);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Lỗi hệ thống, vui lòng thử lại sau!"));
         }
     }
 
@@ -66,7 +82,7 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
 
-    // ✅ API lấy danh mục theo ID
+    // API lấy danh mục theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
         Categories category = categoryService.findById(id);
@@ -76,9 +92,13 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
 
-    // ✅ API cập nhật danh mục
+    //  API cập nhật danh mục
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest) {
+        if (categoryRequest == null) {
+            return ResponseEntity.badRequest().body("Dữ liệu yêu cầu không hợp lệ!");
+        }
+
         Categories existingCategory = categoryService.findById(id);
         if (existingCategory == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
@@ -86,19 +106,22 @@ public class CategoryController {
 
         existingCategory.setName(categoryRequest.getName());
         existingCategory.setDescription(categoryRequest.getDescription());
+        existingCategory.setCode(categoryRequest.getCode());
         existingCategory.setActiveFlag(categoryRequest.getActiveFlag());
 
         categoryService.save(existingCategory);
         return ResponseEntity.ok(existingCategory);
     }
 
-    // ✅ API xóa danh mục
+    //  API xóa danh mục
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        Categories category = categoryService.findById(id);
-        if (category == null) {
+        Optional<Categories> category = Optional.ofNullable(categoryService.findById(id));
+
+        if (category.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }
+
         categoryService.delete(id);
         return ResponseEntity.ok("Category deleted successfully");
     }

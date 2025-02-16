@@ -1,38 +1,37 @@
-package com.ra.inventory_management.model.entity;
+package com.ra.inventory_management.model.entity.product;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Entity
+@Table(name = "customer")
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Auth {
+@AllArgsConstructor
+@ToString
+public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "menu_id")
-    private Menu menu;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Roles roles;
+    @Column(nullable = false, length = 100)
+    private String name;
 
-    @Column(name = "permission", nullable = false)
-    private Integer permission;
+    @Column(nullable = false, length = 50, unique = true)
+    private String email;
+
+    @Column(nullable = false, length = 15, unique = true)
+    private String phone;
+
+    @Column(nullable = false, length = 255)
+    private String address;
 
 
     @Column(name = "active_flag", nullable = false)
-    private Integer activeFlag;
+    private int activeFlag;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -48,7 +47,5 @@ public class Auth {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
-
-
-
 }
+

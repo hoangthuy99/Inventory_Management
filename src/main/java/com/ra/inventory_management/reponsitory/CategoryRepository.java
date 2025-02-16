@@ -1,7 +1,6 @@
-package com.ra.inventory_management.repository;
+package com.ra.inventory_management.reponsitory;
 
-
-import com.ra.inventory_management.model.entity.Categories;
+import com.ra.inventory_management.model.entity.product.Categories;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Categories, Long> {
-    List<Categories> findByActiveFlag(Integer activeFlag);
+
     boolean existsByName(String name);
     boolean existsById(Long id);
     Page<Categories> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
@@ -20,4 +19,6 @@ public interface CategoryRepository extends JpaRepository<Categories, Long> {
     List<Categories> searchCategoriesByName(String keyword);
 
     boolean existsByCode(String code);
+
+    List<Categories> findByActiveFlag(int i);
 }

@@ -2,8 +2,8 @@ package com.ra.inventory_management.service.impl;
 
 
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
-import com.ra.inventory_management.model.entity.Categories;
-import com.ra.inventory_management.repository.CategoryRepository;
+import com.ra.inventory_management.model.entity.product.Categories;
+import com.ra.inventory_management.reponsitory.CategoryRepository;
 import com.ra.inventory_management.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,7 +35,6 @@ public class CategoryServiceIMPL implements CategoryService {
 
     @Override
     public Categories save(CategoryRequest categoryRequest) {
-
         if (categoryRepository.existsByName(categoryRequest.getName())) {
             throw new IllegalArgumentException("Tên danh mục đã tồn tại, vui lòng nhập tên danh mục khác!");
         }
@@ -47,6 +46,7 @@ public class CategoryServiceIMPL implements CategoryService {
         category.setCode(categoryRequest.getCode());
         category.setDescription(categoryRequest.getDescription());
         category.setActiveFlag(categoryRequest.getActiveFlag() != null ? categoryRequest.getActiveFlag() : 1);
+
         return categoryRepository.save(category);
     }
 
@@ -57,6 +57,9 @@ public class CategoryServiceIMPL implements CategoryService {
 
     @Override
     public void delete(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new RuntimeException("Không tìm thấy danh mục");
+        }
         categoryRepository.deleteById(id);
     }
 

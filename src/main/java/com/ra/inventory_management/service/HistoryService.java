@@ -1,9 +1,7 @@
 package com.ra.inventory_management.service;
 
-import com.ra.inventory_management.model.dto.request.CategoryRequest;
 import com.ra.inventory_management.model.dto.request.HistoryRequest;
-import com.ra.inventory_management.model.entity.Categories;
-import com.ra.inventory_management.model.entity.History;
+import com.ra.inventory_management.model.entity.product.History;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

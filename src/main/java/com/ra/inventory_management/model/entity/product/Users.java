@@ -1,4 +1,4 @@
-package com.ra.inventory_management.model.entity;
+package com.ra.inventory_management.model.entity.product;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

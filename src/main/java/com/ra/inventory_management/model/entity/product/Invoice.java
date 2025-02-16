@@ -1,40 +1,39 @@
-package com.ra.inventory_management.model.entity;
+package com.ra.inventory_management.model.entity.product;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-
 
 @Entity
+@Table(name = "invoice")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
-public class Categories {
-    @Column(name = "id")
+public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "cate_name", nullable = false, length = 100)
-    private String name;
+    @Column(name = "code", length = 50, nullable = false)
     private String code;
 
-    private String description;
+    @Column(name = "type")
+    private int type;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductInfo productId;
 
-    @OneToMany(mappedBy = "categories")
-    @JsonIgnore
-    List<ProductInfo> productInfo;
+    @Column(name = "qty")
+    private int qty;
 
-    @Column(name = "active_flag", nullable = false)
-    private int activeFlag;
+    @Column(name = "price", precision = 15, scale = 2)
+    private BigDecimal price;
+
+    @Column(name = "active_flag")
+    private boolean activeFlag;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;

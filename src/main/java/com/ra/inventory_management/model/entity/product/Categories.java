@@ -1,33 +1,39 @@
-package com.ra.inventory_management.model.entity;
+package com.ra.inventory_management.model.entity.product;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 @Entity
-@Table(name = "menu")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
-public class Menu {
+public class Categories {
+    @Column(name = "id")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "parent_id")
-    private int parentId;
+    @Column(name = "cate_name", nullable = false, length = 100)
+    private String name;
+    private String code;
 
-    @Column(name = "url", length = 100, nullable = false)
-    private String url;
+    private String description;
 
-    @Column(name = "order_index", nullable = false)
-    private int orderIndex;
 
-    @Column(name = "active_flag")
+    @OneToMany(mappedBy = "categories")
+    @JsonIgnore
+    List<ProductInfo> productInfo;
+
+    @Column(name = "active_flag", nullable = false)
     private int activeFlag;
 
     @Column(name = "created_date", updatable = false)
@@ -35,7 +41,6 @@ public class Menu {
 
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();
@@ -46,10 +51,4 @@ public class Menu {
         updateDate = LocalDateTime.now();
     }
 
-    @OneToMany(mappedBy = "menu", fetch = FetchType.EAGER)
-    private Set<Auth> auths = new HashSet<>();
-
-    @Transient
-    private List<Menu> child;
 }
-
