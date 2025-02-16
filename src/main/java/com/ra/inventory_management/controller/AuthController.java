@@ -2,7 +2,9 @@ package com.ra.inventory_management.controller;
 
 
 import com.ra.inventory_management.model.dto.request.UserRegister;
-import com.ra.inventory_management.model.entity.*;
+import com.ra.inventory_management.model.entity.product.Auth;
+import com.ra.inventory_management.model.entity.product.Roles;
+import com.ra.inventory_management.model.entity.product.Users;
 import com.ra.inventory_management.service.UserService;
 import com.ra.inventory_management.util.Constant;
 import jakarta.servlet.http.HttpSession;
@@ -94,40 +96,7 @@ public class AuthController {
         }
 
         Roles role = user.getRoles().iterator().next();
-        List<Menu> menuList = new ArrayList<>();
-        List<Menu> menuChildList = new ArrayList<>();
 
-        for (Auth auth : role.getAuths()) {
-            Menu menu = auth.getMenu();
-            if (menu == null || auth.getPermission() != 1 || auth.getActiveFlag() != 1) {
-                continue;
-            }
-
-            // Tạo ID menu an toàn hơn
-            try {
-                menu.setId(Long.parseLong(menu.getUrl().replace("/", "")));
-            } catch (NumberFormatException e) {
-                continue;
-            }
-
-            if (menu.getParentId() == 0 && menu.getOrderIndex() != -1 && menu.getActiveFlag() == 1) {
-                menuList.add(menu);
-            } else if (menu.getParentId() != 0 && menu.getOrderIndex() != -1 && menu.getActiveFlag() == 1) {
-                menuChildList.add(menu);
-            }
-        }
-
-        for (Menu menu : menuList) {
-            List<Menu> childList = menuChildList.stream()
-                    .filter(child -> child.getParentId() == menu.getId())
-                    .collect(Collectors.toList());
-            menu.setChild(childList);
-        }
-
-        menuList.sort(Comparator.comparingInt(Menu::getOrderIndex));
-        menuList.forEach(menu -> menu.getChild().sort(Comparator.comparingInt(Menu::getOrderIndex)));
-
-        session.setAttribute(Constant.MENU_SESSION, menuList);
         session.setAttribute(Constant.USER_INFO, user);
 
         return "redirect:/index";

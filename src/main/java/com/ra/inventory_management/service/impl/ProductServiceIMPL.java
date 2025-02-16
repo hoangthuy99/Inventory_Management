@@ -2,11 +2,12 @@ package com.ra.inventory_management.service.impl;
 
 
 
+import com.ra.inventory_management.model.dto.request.ProductInStockRequest;
 import com.ra.inventory_management.model.dto.request.ProductRequest;
-import com.ra.inventory_management.model.entity.Categories;
-import com.ra.inventory_management.model.entity.ProductInfo;
-import com.ra.inventory_management.repository.CategoryRepository;
-import com.ra.inventory_management.repository.ProductRepository;
+import com.ra.inventory_management.model.entity.product.Categories;
+import com.ra.inventory_management.model.entity.product.ProductInfo;
+import com.ra.inventory_management.reponsitory.CategoryRepository;
+import com.ra.inventory_management.reponsitory.ProductRepository;
 import com.ra.inventory_management.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,9 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceIMPL implements ProductService {
@@ -27,7 +32,6 @@ public class ProductServiceIMPL implements ProductService {
     private CategoryRepository categoryRepository;
 
 
-
     @Override
     public Page<ProductInfo> getAll(Pageable pageable, String nameSearch) {
         return productRepository.findAll(pageable);
@@ -35,27 +39,42 @@ public class ProductServiceIMPL implements ProductService {
 
     @Override
     public ProductInfo save(ProductRequest productRequest) {
+        try {
+            if (productRepository.existsByName(productRequest.getName())) {
+                throw new IllegalArgumentException("Tên sản phẩm đã tồn tại, vui lòng nhập tên sản phẩm khác!");
+            }
 
-        if (productRepository.existsByName(productRequest.getName())) {
-            throw new IllegalArgumentException("Tên sản phẩm đã tồn tại, vui lòng nhập tên sản phẩm khác!");
+            // Kiểm tra ID danh mục
+            if (productRequest.getCategoryId() == null) {
+                throw new IllegalArgumentException("ID danh mục không được để trống");
+            }
+
+            Categories category = categoryRepository.findById(productRequest.getCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("ID danh mục không hợp lệ"));
+
+            // Tạo mới đối tượng Product
+            ProductInfo product = new ProductInfo();
+            product.setName(productRequest.getName());
+            product.setCode(productRequest.getCode());
+            product.setQty(productRequest.getQty());
+
+            if (productRequest.getPrice() == null) {
+                throw new IllegalArgumentException("Giá sản phẩm không được để trống");
+            }
+            product.setPrice(BigDecimal.valueOf(productRequest.getPrice()));
+
+            product.setDescription(productRequest.getDescription());
+            product.setImg(productRequest.getImg());  // Ảnh đã được cập nhật từ Controller
+            product.setActiveFlag(productRequest.getActiveFlag() != null ? productRequest.getActiveFlag() : 1);
+            product.setCategories(category);
+
+            return productRepository.save(product);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi hệ thống, vui lòng thử lại!", e);
         }
-
-        // Tạo mới đối tượng Product và lưu vào database
-        ProductInfo product = new ProductInfo();
-        product.setName(productRequest.getName());
-        product.setCode(productRequest.getCode());
-        product.setDescription(productRequest.getDescription());
-        product.setImg(productRequest.getImage());
-        product.setActiveFlag(productRequest.getActiveFlag() != null ? productRequest.getActiveFlag() : 1);
-
-        Categories category = categoryRepository.findById(productRequest.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("ID danh mục không hợp lệ"));
-        product.setCategories(category);
-        product.setImg(productRequest.getImage());
-
-        return productRepository.save(product);
     }
-
     @Override
     public ProductInfo findById(Long id) {
         return productRepository.findById(id).orElse(null);
@@ -73,7 +92,7 @@ public class ProductServiceIMPL implements ProductService {
 
     @Override
     public Page<ProductInfo> getByCategoryId(Long id, Pageable pageable) {
-        return productRepository.findByCategoryId(id,pageable);
+        return productRepository.findByCategoryId(id, pageable);
     }
 
 

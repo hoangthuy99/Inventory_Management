@@ -1,12 +1,12 @@
-package com.ra.inventory_management.model.entity;
+package com.ra.inventory_management.model.entity.product;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,10 +28,10 @@ public class ProductInfo {
     @Column(name = "code", length = 50, unique = true, nullable = false)
     private String code;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Column(name = "img", length = 200)
+    @Column(name = "img", length = 255)
     private String img;
 
     @Column(name = "active_flag", nullable = false)
@@ -44,8 +44,14 @@ public class ProductInfo {
     private LocalDateTime updateDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cate_id")
+    @JoinColumn(name = "cate_id", nullable = false)
     private Categories categories;
+
+    @Column(name = "qty", nullable = false)
+    private int qty;
+
+    @Column(name = "price", precision = 15, scale = 2, nullable = false)
+    private BigDecimal price;
 
     @PrePersist
     protected void onCreate() {
@@ -56,11 +62,12 @@ public class ProductInfo {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
+
     @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<History> histories = new HashSet<>();
 
-    @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<ProductInStock> productInStocks = new HashSet<>();
 
-
+    public void setImg(String img) {
+        this.img = img;
+    }
 }

@@ -1,7 +1,7 @@
 package com.ra.inventory_management.service.impl;
 
 import com.ra.inventory_management.model.dto.request.HistoryRequest;
-import com.ra.inventory_management.model.entity.History;
+import com.ra.inventory_management.model.entity.product.History;
 import com.ra.inventory_management.service.HistoryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

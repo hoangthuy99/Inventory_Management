@@ -2,7 +2,7 @@ package com.ra.inventory_management.service;
 
 
 import com.ra.inventory_management.model.dto.request.UserRegister;
-import com.ra.inventory_management.model.entity.Users;
+import com.ra.inventory_management.model.entity.product.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

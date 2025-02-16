@@ -1,12 +1,13 @@
 package com.ra.inventory_management.service.impl;
 
 import com.ra.inventory_management.model.dto.request.UserRegister;
-import com.ra.inventory_management.model.entity.ERoles;
-import com.ra.inventory_management.model.entity.Roles;
-import com.ra.inventory_management.model.entity.Users;
-import com.ra.inventory_management.repository.RoleRepository;
-import com.ra.inventory_management.repository.UserRepository;
+import com.ra.inventory_management.model.entity.product.ERoles;
+import com.ra.inventory_management.model.entity.product.Roles;
+import com.ra.inventory_management.model.entity.product.Users;
 
+
+import com.ra.inventory_management.reponsitory.RoleRepository;
+import com.ra.inventory_management.reponsitory.UserRepository;
 import com.ra.inventory_management.service.RoleService;
 import com.ra.inventory_management.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;

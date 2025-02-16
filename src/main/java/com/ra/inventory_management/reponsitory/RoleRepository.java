@@ -1,8 +1,8 @@
-package com.ra.inventory_management.repository;
+package com.ra.inventory_management.reponsitory;
 
 
-import com.ra.inventory_management.model.entity.ERoles;
-import com.ra.inventory_management.model.entity.Roles;
+import com.ra.inventory_management.model.entity.product.ERoles;
+import com.ra.inventory_management.model.entity.product.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

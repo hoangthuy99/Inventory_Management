@@ -1,4 +1,4 @@
-package com.ra.inventory_management.model.entity;
+package com.ra.inventory_management.model.entity.product;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,7 +45,9 @@ public class History {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     private ProductInfo productInfo;
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users users; // Người thực hiện nhập/xuất
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();

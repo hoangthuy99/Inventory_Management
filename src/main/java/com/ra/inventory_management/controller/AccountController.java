@@ -1,7 +1,7 @@
 package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.model.dto.request.PasswordRequest;
-import com.ra.inventory_management.model.entity.Users;
+import com.ra.inventory_management.model.entity.product.Users;
 import com.ra.inventory_management.sercurity.UserDetail.UserPrincipal;
 import com.ra.inventory_management.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
