@@ -9,13 +9,13 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ProductService {
-    Page<ProductInfo> getAll(Pageable pageable, String nameSearch);
-    ProductInfo save(ProductRequest productRequest);
+    List<ProductInfo> getAll();
+    ProductInfo save(ProductRequest productRequest, String imagePath);
     ProductInfo findById(Long id);
     void delete(Long id);
     Page<ProductInfo> getByCategoryActiveFlag(Pageable pageable, Integer activeFlag);
     Page<ProductInfo> getByCategoryId(Long id, Pageable pageable);
     List<ProductInfo> searchByName(String keyword);
-    Pageable createPageable(int page, int limit, String sort, String order);
+
 
 }

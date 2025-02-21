@@ -1,40 +1,34 @@
 package com.ra.inventory_management.model.entity.product;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "branch")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Builder
-public class Categories {
+@ToString
+public class Branch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "cate_name", nullable = false, length = 100)
+    @Column(name = "branch_name", nullable = false, length = 100, unique = true)
     private String name;
 
-    @Column(name = "code", length = 50, unique = true, nullable = false)
-    private String code;
+    @Column(nullable = false, length = 255)
+    private String address;
 
-    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
-    private String description;
-
-    @OneToMany(mappedBy = "categories", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
-    @ToString.Exclude
-    private List<ProductInfo> productInfo = new ArrayList<>();
+    @Column(nullable = false, length = 15, unique = true)
+    private String phone;
 
     @Column(name = "active_flag", nullable = false)
-    private int activeFlag;
+    private Integer activeFlag;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -42,6 +36,9 @@ public class Categories {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
+    // Mỗi chi nhánh có thể có nhiều đơn hàng
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+    private List<Orders> orders;
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();
@@ -52,3 +49,4 @@ public class Categories {
         updateDate = LocalDateTime.now();
     }
 }
+
