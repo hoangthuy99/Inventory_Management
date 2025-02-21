@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,9 +24,9 @@ public class ProductRequest {
     private Double price;
 
     @Min(value = 0, message = "Số lượng không được nhỏ hơn 0")
-    private int qty;
+    private Integer qty;
 
-    private String img;
+    private MultipartFile img;
 
     @NotNull(message = "Hãy chọn danh mục sản phẩm")
     private Long categoryId;

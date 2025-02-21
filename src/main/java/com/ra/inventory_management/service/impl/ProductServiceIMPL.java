@@ -2,13 +2,15 @@ package com.ra.inventory_management.service.impl;
 
 
 
-import com.ra.inventory_management.model.dto.request.ProductInStockRequest;
+
 import com.ra.inventory_management.model.dto.request.ProductRequest;
 import com.ra.inventory_management.model.entity.product.Categories;
 import com.ra.inventory_management.model.entity.product.ProductInfo;
 import com.ra.inventory_management.reponsitory.CategoryRepository;
 import com.ra.inventory_management.reponsitory.ProductRepository;
 import com.ra.inventory_management.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -22,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class ProductServiceIMPL implements ProductService {
@@ -30,21 +32,20 @@ public class ProductServiceIMPL implements ProductService {
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
-
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     @Override
-    public Page<ProductInfo> getAll(Pageable pageable, String nameSearch) {
-        return productRepository.findAll(pageable);
+    public List<ProductInfo> getAll() {
+        return productRepository.findAll();
     }
 
     @Override
-    public ProductInfo save(ProductRequest productRequest) {
+    public ProductInfo save(ProductRequest productRequest, String imagePath) {
         try {
             if (productRepository.existsByName(productRequest.getName())) {
                 throw new IllegalArgumentException("Tên sản phẩm đã tồn tại, vui lòng nhập tên sản phẩm khác!");
             }
 
-            // Kiểm tra ID danh mục
             if (productRequest.getCategoryId() == null) {
                 throw new IllegalArgumentException("ID danh mục không được để trống");
             }
@@ -52,30 +53,27 @@ public class ProductServiceIMPL implements ProductService {
             Categories category = categoryRepository.findById(productRequest.getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("ID danh mục không hợp lệ"));
 
-            // Tạo mới đối tượng Product
             ProductInfo product = new ProductInfo();
             product.setName(productRequest.getName());
             product.setCode(productRequest.getCode());
             product.setQty(productRequest.getQty());
-
-            if (productRequest.getPrice() == null) {
-                throw new IllegalArgumentException("Giá sản phẩm không được để trống");
-            }
             product.setPrice(BigDecimal.valueOf(productRequest.getPrice()));
-
             product.setDescription(productRequest.getDescription());
-            product.setImg(productRequest.getImg());  // Ảnh đã được cập nhật từ Controller
             product.setActiveFlag(productRequest.getActiveFlag() != null ? productRequest.getActiveFlag() : 1);
             product.setCategories(category);
+            product.setImg(imagePath);
 
-            return productRepository.save(product);
+            return productRepository.save(product); // Lưu vào cơ sở dữ liệu
         } catch (IllegalArgumentException e) {
+            logger.error("Validation error: ", e); // Log lỗi chi tiết
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception e) {
+            logger.error("Lỗi khi lưu sản phẩm", e); // Log lỗi chi tiết
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi hệ thống, vui lòng thử lại!", e);
         }
     }
-    @Override
+
+        @Override
     public ProductInfo findById(Long id) {
         return productRepository.findById(id).orElse(null);
     }
@@ -101,19 +99,6 @@ public class ProductServiceIMPL implements ProductService {
         return productRepository.searchProductByName(keyword);
     }
 
-    @Override
-    public Pageable createPageable(int page, int limit, String sort, String order) {
-        Sort sortOrder;
-        if ("asc".equalsIgnoreCase(order)) {
-            sortOrder = Sort.by(sort).ascending();
-        } else if ("name_desc".equals(sort)) {
-            sortOrder = Sort.by("name").descending();
-        } else if ("price_desc".equals(sort)) {
-            sortOrder = Sort.by("price").descending();
-        } else {
-            sortOrder = Sort.by(sort).descending();
-        }
-        return PageRequest.of(page, limit, sortOrder);
-    }
+
 
 }

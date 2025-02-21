@@ -5,16 +5,14 @@ import com.ra.inventory_management.model.entity.product.Categories;
 import com.ra.inventory_management.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,16 +23,9 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<Page<Categories>> getCategories(@RequestParam(defaultValue = "5", name = "limit") int limit, @RequestParam(defaultValue = "0", name = "page") int page, @RequestParam(defaultValue = "id", name = "sort") String sort, @RequestParam(defaultValue = "asc", name = "order") String order, @RequestParam(value = "nameSearch", required = false) String nameSearch) {
-        Pageable pageable = order.equals("asc") ? PageRequest.of(page, limit, Sort.by(sort).ascending()) : PageRequest.of(page, limit, Sort.by(sort).descending());
-
-        if (nameSearch != null && nameSearch.trim().isEmpty()) {
-            nameSearch = null;
-        }
-
-        Page<Categories> categories = categoryService.getAll(pageable, nameSearch);
-
-        return ResponseEntity.ok(categories);
+    public ResponseEntity<List<Categories>> getCategories() {
+        List<Categories> categoryList = categoryService.getAll();
+        return ResponseEntity.ok(categoryList);
     }
 
     @PostMapping(value = "/add-category", produces = MediaType.APPLICATION_JSON_VALUE)
