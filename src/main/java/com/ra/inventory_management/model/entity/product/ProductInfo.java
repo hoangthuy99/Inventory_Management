@@ -1,10 +1,7 @@
 package com.ra.inventory_management.model.entity.product;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -45,13 +42,18 @@ public class ProductInfo {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cate_id", nullable = false)
+    @ToString.Exclude
     private Categories categories;
 
     @Column(name = "qty", nullable = false)
-    private int qty;
+    private Integer qty;
 
     @Column(name = "price", precision = 15, scale = 2, nullable = false)
     private BigDecimal price;
+
+    @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<History> histories = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
@@ -62,10 +64,6 @@ public class ProductInfo {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
-
-    @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<History> histories = new HashSet<>();
-
 
     public void setImg(String img) {
         this.img = img;

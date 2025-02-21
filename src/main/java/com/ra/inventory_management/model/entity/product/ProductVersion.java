@@ -20,6 +20,8 @@ public class ProductVersion {
     private ProductInfo product;
     @Column(nullable = false, length = 50)
     private String color;
+    @Column(nullable = false, length = 50)
+    private String size;
     @Column(nullable = false)
     private int importPrice;
 
