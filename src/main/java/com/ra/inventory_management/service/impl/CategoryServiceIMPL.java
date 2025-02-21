@@ -17,10 +17,11 @@ public class CategoryServiceIMPL implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+
+
     @Override
-    public Page<Categories> getAll(Pageable pageable, String nameSearch) {
-        if (nameSearch != null) return categoryRepository.findAllByNameContainingIgnoreCase(nameSearch, pageable);
-        return categoryRepository.findAll(pageable);
+    public List<Categories> getAll() {
+        return categoryRepository.findAll();
     }
 
     @Override

@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -50,20 +50,6 @@ public class AccountController {
 
 
 
-    @PostMapping("/edit-account")
-    public String updateAcc(@ModelAttribute("user") Users user, @RequestParam("imageUser") MultipartFile file) {
-        Long id = getUserId();
-        String fileName = file.getOriginalFilename();
-        try {
-            FileCopyUtils.copy(file.getBytes(),new File(pathUpload+fileName));
-            // lưu tên file vào database
-            user.setAvatar(fileName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        userService.updateAcc(user, id);
-        return "redirect:/user/account";
-    }
 
 
     @PostMapping("/change-password")
