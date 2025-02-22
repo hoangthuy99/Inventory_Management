@@ -2,7 +2,7 @@ package com.ra.inventory_management.service;
 
 
 import com.ra.inventory_management.model.dto.request.ProductRequest;
-import com.ra.inventory_management.model.entity.product.ProductInfo;
+import com.ra.inventory_management.model.entity.ProductInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

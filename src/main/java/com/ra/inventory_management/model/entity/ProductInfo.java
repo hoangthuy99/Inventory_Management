@@ -1,4 +1,4 @@
-package com.ra.inventory_management.model.entity.product;
+package com.ra.inventory_management.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,10 +50,6 @@ public class ProductInfo {
 
     @Column(name = "price", precision = 15, scale = 2, nullable = false)
     private BigDecimal price;
-
-    @OneToMany(mappedBy = "productInfo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private Set<History> histories = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

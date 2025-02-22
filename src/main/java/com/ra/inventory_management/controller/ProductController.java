@@ -1,12 +1,9 @@
 package com.ra.inventory_management.controller;
 
 
-import com.ra.inventory_management.model.dto.request.CategoryRequest;
 import com.ra.inventory_management.model.dto.request.ProductRequest;
 import com.ra.inventory_management.model.dto.response.ProductResponse;
-import com.ra.inventory_management.model.entity.product.Categories;
-import com.ra.inventory_management.model.entity.product.ProductInfo;
-import com.ra.inventory_management.service.CategoryService;
+import com.ra.inventory_management.model.entity.ProductInfo;
 import com.ra.inventory_management.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +33,6 @@ import java.io.*;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import net.coobird.thumbnailator.Thumbnails;
 
 @RestController
 @RequestMapping("/app/product")
@@ -107,7 +102,7 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
             @Valid @ModelAttribute ProductRequest productRequest,

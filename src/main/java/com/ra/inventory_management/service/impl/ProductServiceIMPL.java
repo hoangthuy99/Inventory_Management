@@ -4,8 +4,8 @@ package com.ra.inventory_management.service.impl;
 
 
 import com.ra.inventory_management.model.dto.request.ProductRequest;
-import com.ra.inventory_management.model.entity.product.Categories;
-import com.ra.inventory_management.model.entity.product.ProductInfo;
+import com.ra.inventory_management.model.entity.Categories;
+import com.ra.inventory_management.model.entity.ProductInfo;
 import com.ra.inventory_management.reponsitory.CategoryRepository;
 import com.ra.inventory_management.reponsitory.ProductRepository;
 import com.ra.inventory_management.service.ProductService;
@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

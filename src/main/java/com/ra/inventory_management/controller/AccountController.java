@@ -1,7 +1,7 @@
 package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.model.dto.request.PasswordRequest;
-import com.ra.inventory_management.model.entity.product.Users;
+import com.ra.inventory_management.model.entity.Users;
 import com.ra.inventory_management.sercurity.UserDetail.UserPrincipal;
 import com.ra.inventory_management.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
-
-
-import java.io.File;
-import java.io.IOException;
-
 
 
 @RestController

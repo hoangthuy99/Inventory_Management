@@ -1,7 +1,7 @@
 package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
-import com.ra.inventory_management.model.entity.product.Categories;
+import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
