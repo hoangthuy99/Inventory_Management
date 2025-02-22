@@ -1,39 +1,43 @@
-package com.ra.inventory_management.model.entity.product;
+package com.ra.inventory_management.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
+@Table(name = "customer")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Builder
-@Table(name = "roles")
-public class Roles {
-
+@ToString
+public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "role_name", nullable = false, unique = true)
-    @Enumerated(EnumType.STRING)
-    private ERoles roleName;
+    @Column(nullable = false, length = 100)
+    private String name;
 
-    @Column(name = "description")
-    private String description;
+    @Column(nullable = false, length = 50, unique = true)
+    private String email;
 
-    @Column(name = "active_flag")
-    private Integer activeFlag;
+    @Column(nullable = false, length = 15, unique = true)
+    private String phone;
+
+    @Column(nullable = false, length = 255)
+    private String address;
+
+
+    @Column(name = "active_flag", nullable = false)
+    private int activeFlag;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
 
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();
@@ -43,11 +47,5 @@ public class Roles {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
-
-
-    @OneToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Auth> auths;
-
-
-
 }
+

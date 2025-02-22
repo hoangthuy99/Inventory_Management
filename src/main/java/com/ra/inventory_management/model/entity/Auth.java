@@ -1,4 +1,4 @@
-package com.ra.inventory_management.model.entity.product;
+package com.ra.inventory_management.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,32 +6,26 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "customer")
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-@ToString
-public class Customer {
+@NoArgsConstructor
+public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Roles roles;
 
-    @Column(nullable = false, length = 50, unique = true)
-    private String email;
-
-    @Column(nullable = false, length = 15, unique = true)
-    private String phone;
-
-    @Column(nullable = false, length = 255)
-    private String address;
+    @Column(name = "permission", nullable = false)
+    private Integer permission;
 
 
     @Column(name = "active_flag", nullable = false)
-    private int activeFlag;
+    private Integer activeFlag;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -47,5 +41,7 @@ public class Customer {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
-}
 
+
+
+}

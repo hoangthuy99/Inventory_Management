@@ -1,8 +1,7 @@
 package com.ra.inventory_management.model.dto.response;
 
-import com.ra.inventory_management.model.entity.product.Categories;
-import com.ra.inventory_management.model.entity.product.History;
-import com.ra.inventory_management.model.entity.product.ProductInfo;
+import com.ra.inventory_management.model.entity.Categories;
+import com.ra.inventory_management.model.entity.ProductInfo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +24,6 @@ public class ProductResponse {
     private Categories categories;
     private Integer qty;
     private BigDecimal price;
-    private Set<History> histories = new HashSet<>();
 
     public ProductResponse(ProductInfo product) {
         this.id = product.getId();
@@ -39,6 +37,5 @@ public class ProductResponse {
         this.categories = product.getCategories();
         this.qty = product.getQty();
         this.price = product.getPrice();
-        this.histories = new HashSet<>(product.getHistories());
     }
 }

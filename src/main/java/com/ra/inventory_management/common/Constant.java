@@ -1,4 +1,4 @@
-package com.ra.inventory_management.util;
+package com.ra.inventory_management.common;
 
 public class Constant {
     public static final String USER_INFO ="userInfo";
