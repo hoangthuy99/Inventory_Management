@@ -2,12 +2,10 @@ package com.ra.inventory_management.service.impl;
 
 
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
-import com.ra.inventory_management.model.entity.product.Categories;
+import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.reponsitory.CategoryRepository;
 import com.ra.inventory_management.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,6 +1,5 @@
 package com.ra.inventory_management.model.entity;
 
-import com.ra.inventory_management.model.entity.product.ProductInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
