@@ -1,28 +1,31 @@
-package com.ra.inventory_management.model.entity.product;
+package com.ra.inventory_management.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
+@Table(name = "branch")
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Auth {
+@AllArgsConstructor
+@ToString
+public class Branch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Roles roles;
+    @Column(name = "branch_name", nullable = false, length = 100, unique = true)
+    private String name;
 
-    @Column(name = "permission", nullable = false)
-    private Integer permission;
+    @Column(nullable = false, length = 255)
+    private String address;
 
+    @Column(nullable = false, length = 15, unique = true)
+    private String phone;
 
     @Column(name = "active_flag", nullable = false)
     private Integer activeFlag;
@@ -32,6 +35,10 @@ public class Auth {
 
     @Column(name = "update_date")
     private LocalDateTime updateDate;
+
+    // Mỗi chi nhánh có thể có nhiều đơn hàng
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+    private List<Orders> orders;
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();
@@ -41,7 +48,5 @@ public class Auth {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
-
-
-
 }
+

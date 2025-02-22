@@ -1,9 +1,9 @@
 package com.ra.inventory_management.service.impl;
 
 import com.ra.inventory_management.model.dto.request.UserRegister;
-import com.ra.inventory_management.model.entity.product.ERoles;
-import com.ra.inventory_management.model.entity.product.Roles;
-import com.ra.inventory_management.model.entity.product.Users;
+import com.ra.inventory_management.common.ERoles;
+import com.ra.inventory_management.model.entity.Roles;
+import com.ra.inventory_management.model.entity.Users;
 
 
 import com.ra.inventory_management.reponsitory.RoleRepository;
