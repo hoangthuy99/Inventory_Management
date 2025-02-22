@@ -1,6 +1,6 @@
 package com.ra.inventory_management.reponsitory;
 
-import com.ra.inventory_management.model.entity.product.Categories;
+import com.ra.inventory_management.model.entity.Categories;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

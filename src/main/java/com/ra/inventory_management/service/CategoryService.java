@@ -3,7 +3,7 @@ package com.ra.inventory_management.service;
 
 
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
-import com.ra.inventory_management.model.entity.product.Categories;
+import com.ra.inventory_management.model.entity.Categories;
 
 
 import java.util.List;

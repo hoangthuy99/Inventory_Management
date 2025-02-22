@@ -1,6 +1,6 @@
 package com.ra.inventory_management.sercurity.UserDetail;
 
-import com.ra.inventory_management.model.entity.product.Users;
+import com.ra.inventory_management.model.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
