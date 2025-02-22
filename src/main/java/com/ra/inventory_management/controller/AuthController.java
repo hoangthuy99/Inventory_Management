@@ -2,11 +2,10 @@ package com.ra.inventory_management.controller;
 
 
 import com.ra.inventory_management.model.dto.request.UserRegister;
-import com.ra.inventory_management.model.entity.product.Auth;
-import com.ra.inventory_management.model.entity.product.Roles;
-import com.ra.inventory_management.model.entity.product.Users;
+import com.ra.inventory_management.model.entity.Roles;
+import com.ra.inventory_management.model.entity.Users;
 import com.ra.inventory_management.service.UserService;
-import com.ra.inventory_management.util.Constant;
+import com.ra.inventory_management.common.Constant;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -17,15 +16,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Comparator;
-
 
 
 @RestController
-@RequestMapping("/app/category")
+@RequestMapping("/app/auth")
 public class AuthController {
 
     private final UserService userService;

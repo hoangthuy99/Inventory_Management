@@ -1,34 +1,36 @@
-package com.ra.inventory_management.model.entity.product;
+package com.ra.inventory_management.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "branch")
+@Table(name = "supplier")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Branch {
+public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "branch_name", nullable = false, length = 100, unique = true)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 255)
-    private String address;
+    @Column(nullable = false, length = 50, unique = true)
+    private String email;
 
     @Column(nullable = false, length = 15, unique = true)
     private String phone;
 
+    @Column(nullable = false, length = 255)
+    private String address;
+
     @Column(name = "active_flag", nullable = false)
-    private Integer activeFlag;
+    private int activeFlag;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -36,9 +38,6 @@ public class Branch {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    // Mỗi chi nhánh có thể có nhiều đơn hàng
-    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
-    private List<Orders> orders;
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();
@@ -49,4 +48,3 @@ public class Branch {
         updateDate = LocalDateTime.now();
     }
 }
-
