@@ -1,5 +1,6 @@
 package com.ra.inventory_management.model.entity;
 
+import com.ra.inventory_management.common.EOrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,14 +26,15 @@ public class Orders {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
     @ManyToOne
-    @JoinColumn(name = "branch_id") // Đảm bảo có khóa ngoại
+    @JoinColumn(name = "branch_id")
     private Branch branch;
 
     @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
     private BigDecimal totalPrice;
 
     @Column(name = "status", nullable = false)
-    private Integer status; // 0: Pending, 1: Confirmed, 2: Shipped, 3: Completed, 4: Canceled
+    @Enumerated(EnumType.STRING) // Hoặc dùng EnumType.ORDINAL nếu muốn lưu số
+    private EOrderStatus status;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
