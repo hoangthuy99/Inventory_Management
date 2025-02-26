@@ -20,6 +20,8 @@ public class Branch {
 
     @Column(name = "branch_name", nullable = false, length = 100, unique = true)
     private String name;
+    @Column(name = "branch_code", length = 50, unique = true, nullable = false)
+    private String branchCode;
 
     @Column(nullable = false, length = 255)
     private String address;
