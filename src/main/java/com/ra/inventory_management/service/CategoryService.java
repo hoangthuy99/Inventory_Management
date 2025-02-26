@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface CategoryService {
     List<Categories> getAll();
-    List<Categories> findAll();
     Categories save(Categories category);
 
     Categories findById(Long id);

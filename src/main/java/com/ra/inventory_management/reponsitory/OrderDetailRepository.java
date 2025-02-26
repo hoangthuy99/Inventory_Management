@@ -1,13 +1,13 @@
 package com.ra.inventory_management.reponsitory;
 
 import com.ra.inventory_management.model.entity.OrderDetails;
-import com.ra.inventory_management.model.entity.Orders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetails, Long> {
     // Lấy danh sách chi tiết đơn hàng theo order_id
     List<OrderDetails> findByOrderId(Long orderId);
