@@ -21,10 +21,6 @@ public class CategoryServiceIMPL implements CategoryService {
         return categoryRepository.findAll();
     }
 
-    @Override
-    public List<Categories> findAll() {
-        return categoryRepository.findAll();
-    }
 
     @Override
     public Categories save(Categories category) {

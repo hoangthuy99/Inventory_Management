@@ -3,7 +3,7 @@ package com.ra.inventory_management.service.impl;
 import com.ra.inventory_management.common.EOrderStatus;
 import com.ra.inventory_management.model.entity.Customer;
 import com.ra.inventory_management.model.entity.Orders;
-import com.ra.inventory_management.repository.OrderRepository;
+import com.ra.inventory_management.reponsitory.OrderRepository;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
