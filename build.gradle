@@ -30,6 +30,19 @@ dependencies {
 	implementation 'com.twelvemonkeys.imageio:imageio-core:3.6.4'
 	implementation 'net.coobird:thumbnailator:0.4.14'
 
+	// Jwt token
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
+
+	// Excel
+	implementation 'org.apache.poi:poi-ooxml:5.1.0'
+
+	// Oauth
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -20,6 +20,9 @@ public class Customer {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(name = "cus_code", length = 50, unique = true, nullable = false)
+    private String cusCode;
+
     @Column(nullable = false, length = 50, unique = true)
     private String email;
 

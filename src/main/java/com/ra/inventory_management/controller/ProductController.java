@@ -1,7 +1,9 @@
 package com.ra.inventory_management.controller;
 
 
+import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.dto.request.ProductRequest;
+import com.ra.inventory_management.model.dto.response.BaseResponse;
 import com.ra.inventory_management.model.dto.response.ProductResponse;
 import com.ra.inventory_management.model.entity.ProductInfo;
 import com.ra.inventory_management.service.ProductService;
@@ -32,6 +34,7 @@ import java.io.*;
 
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,6 +44,7 @@ public class ProductController {
     private String uploadDir;
     @Autowired
     private ProductService productService;
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductInfo> getProductById(@PathVariable Long id) {
         ProductInfo product = productService.findById(id);
@@ -51,13 +55,14 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts(){
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> products = productService.getAll()
                 .stream()
                 .map(ProductResponse::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(products);
     }
+
     @GetMapping("/uploads/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) throws MalformedURLException {
         Path file = Paths.get("uploads").resolve(filename);
@@ -96,12 +101,13 @@ public class ProductController {
         }
 
 
-    String imagePath = "uploads/" + image.getOriginalFilename();
+        String imagePath = "uploads/" + image.getOriginalFilename();
         // Gọi service để lưu sản phẩm
         ProductInfo product = productService.save(productRequest, imagePath);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
+
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
@@ -128,7 +134,7 @@ public class ProductController {
         }
 
         // Cập nhật thông tin sản phẩm
-        productService.save( productRequest, imagePath);
+        productService.save(productRequest, imagePath);
 
         return ResponseEntity.ok("Cập nhật sản phẩm thành công");
     }
@@ -150,5 +156,21 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, limit);
         Page<ProductInfo> products = productService.getByCategoryId(id, pageable);
         return ResponseEntity.ok(products);
+    }
+
+    // API import file excel
+    @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<?> importExcel(
+            @RequestParam("file") MultipartFile file
+    )
+            throws IOException {
+        List<ProductInfo> response = productService.importExcel(file);
+        return ResponseEntity.ok().body(new BaseResponse<>(response));
+    }
+
+    @GetMapping("sampleExcel")
+    public ResponseEntity<?> getSampleExcel() throws IOException {
+        Map<String, String> response = productService.getSampleExcel();
+        return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 }

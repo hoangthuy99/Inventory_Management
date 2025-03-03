@@ -1,7 +1,10 @@
 package com.ra.inventory_management.controller;
 
+import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
+import com.ra.inventory_management.model.dto.response.BaseResponse;
 import com.ra.inventory_management.model.entity.Categories;
+import com.ra.inventory_management.model.entity.ProductInfo;
 import com.ra.inventory_management.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -115,5 +120,20 @@ public class CategoryController {
 
         categoryService.delete(id);
         return ResponseEntity.ok("Category deleted successfully");
+    }
+
+    // API import file excel
+    @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<?> importExcel(
+            @RequestParam("file") MultipartFile file
+    )
+            throws IOException {
+        List<Categories> response = categoryService.importExcel(file);
+        return ResponseEntity.ok().body(new BaseResponse<>(response));
+    }
+
+    @GetMapping("sampleExcel")
+    public ResponseEntity<?> getSampleExcel() {
+        return ResponseEntity.ok().body(new BaseResponse<>("/uploads" + Constant.CATEGORY_SAMPLE));
     }
 }
