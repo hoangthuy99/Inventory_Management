@@ -10,9 +10,8 @@ import java.util.List;
 
 public interface CategoryService {
     List<Categories> getAll();
-    List<Categories> findAll();
     Categories save(Categories category);
-    Categories save(CategoryRequest categoryRequest);
+
     Categories findById(Long id);
     void delete(Long id);
     List<Categories> getbyActiveFlag();

@@ -1,6 +1,6 @@
 package com.ra.inventory_management.service.impl;
 
-import com.ra.inventory_management.model.dto.request.UserRegister;
+import com.ra.inventory_management.model.dto.request.RegisterRequest;
 import com.ra.inventory_management.common.ERoles;
 import com.ra.inventory_management.model.entity.Roles;
 import com.ra.inventory_management.model.entity.Users;
@@ -40,22 +40,22 @@ public class UserServiceIMPL implements UserService {
 
 
     @Override
-    public Users handleRegister(UserRegister userRegister) {
+    public Users handleRegister(RegisterRequest registerRequest) {
         Logger logger = LoggerFactory.getLogger(getClass());
 
-        if (userRepository.existsByUsername(userRegister.getUsername())) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new IllegalArgumentException("Username đã tồn tại!");
         }
 
-        if (userRepository.existsByEmail(userRegister.getEmail())) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new IllegalArgumentException("Email đã tồn tại!");
         }
 
         Users user = new Users();
-        user.setFullName(userRegister.getFullName());
-        user.setUsername(userRegister.getUsername());
-        user.setEmail(userRegister.getEmail());
-        user.setPassword(userRegister.getPassword());
+        user.setFullName(registerRequest.getFullName());
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(registerRequest.getPassword());
 
         Set<Roles> defaultRoles = new HashSet<>();
         defaultRoles.add(roleRepository.findByRoleName(ERoles.ROLE_STAFF));

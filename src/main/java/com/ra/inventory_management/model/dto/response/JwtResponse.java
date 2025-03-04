@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,5 +17,5 @@ public class JwtResponse {
     private String fullName;
     private String username;
     private String email;
-    private Set<String> roles;
+    private List<String> roles;
 }

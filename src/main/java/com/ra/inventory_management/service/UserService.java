@@ -1,7 +1,7 @@
 package com.ra.inventory_management.service;
 
 
-import com.ra.inventory_management.model.dto.request.UserRegister;
+import com.ra.inventory_management.model.dto.request.RegisterRequest;
 import com.ra.inventory_management.model.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface UserService {
 
 
-    Users handleRegister(UserRegister userRegister);
+    Users handleRegister(RegisterRequest registerRequest);
 
     Page<Users> getAll(Pageable pageable);
     Users findById(Long id);

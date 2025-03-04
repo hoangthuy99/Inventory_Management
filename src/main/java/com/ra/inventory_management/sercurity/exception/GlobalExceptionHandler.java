@@ -1,5 +1,6 @@
 package com.ra.inventory_management.sercurity.exception;
 
+import com.ra.inventory_management.model.dto.response.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,6 +21,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        BaseResponse response = new BaseResponse(400, ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

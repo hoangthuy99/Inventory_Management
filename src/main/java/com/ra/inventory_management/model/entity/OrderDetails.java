@@ -26,9 +26,8 @@ public class OrderDetails {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "unit_price", precision = 15, scale = 2, nullable = false)
-    private BigDecimal unitPrice;
 
     @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
-    private BigDecimal totalPrice;
+    private BigDecimal unitPrice;
+
 }

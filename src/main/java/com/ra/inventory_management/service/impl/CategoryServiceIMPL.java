@@ -1,7 +1,6 @@
 package com.ra.inventory_management.service.impl;
 
 
-import com.ra.inventory_management.model.dto.request.CategoryRequest;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.reponsitory.CategoryRepository;
 import com.ra.inventory_management.service.CategoryService;
@@ -22,32 +21,12 @@ public class CategoryServiceIMPL implements CategoryService {
         return categoryRepository.findAll();
     }
 
-    @Override
-    public List<Categories> findAll() {
-        return categoryRepository.findAll();
-    }
 
     @Override
     public Categories save(Categories category) {
         return categoryRepository.save(category);
     }
 
-    @Override
-    public Categories save(CategoryRequest categoryRequest) {
-        if (categoryRepository.existsByName(categoryRequest.getName())) {
-            throw new IllegalArgumentException("Tên danh mục đã tồn tại, vui lòng nhập tên danh mục khác!");
-        }
-        if (categoryRepository.existsByCode(categoryRequest.getCode())) {
-            throw new IllegalArgumentException("Mã code danh mục đã tồn tại, vui lòng nhập code danh mục khác!");
-        }
-        Categories category = new Categories();
-        category.setName(categoryRequest.getName());
-        category.setCode(categoryRequest.getCode());
-        category.setDescription(categoryRequest.getDescription());
-        category.setActiveFlag(categoryRequest.getActiveFlag() != null ? categoryRequest.getActiveFlag() : 1);
-
-        return categoryRepository.save(category);
-    }
 
     @Override
     public Categories findById(Long id) {
