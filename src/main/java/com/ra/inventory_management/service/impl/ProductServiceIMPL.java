@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -179,6 +181,8 @@ public class ProductServiceIMPL implements ProductService {
             return productRepository.saveAll(productInfos);
         } catch (IOException e) {
             throw e;
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateKeyException("Dữ liệu bị trùng lặp");
         }
     }
 
@@ -186,7 +190,7 @@ public class ProductServiceIMPL implements ProductService {
     public Map<String, String> getSampleExcel() throws IOException {
         try {
             // Get file from resource
-            ClassPathResource pathResource = new ClassPathResource("uploads" + Constant.PRODUCT_SAMPLE);
+            ClassPathResource pathResource = new ClassPathResource(Constant.PRODUCT_SAMPLE);
             if (!pathResource.exists()) {
                 throw new FileNotFoundException("Không tìm thấy file: " + pathResource.getPath());
             }

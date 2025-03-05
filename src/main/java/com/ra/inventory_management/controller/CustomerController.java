@@ -1,13 +1,19 @@
 package com.ra.inventory_management.controller;
 
 
+import com.ra.inventory_management.model.dto.response.BaseResponse;
+import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.Customer;
 import com.ra.inventory_management.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -67,5 +73,21 @@ public class CustomerController {
     public ResponseEntity<List<Customer>> searchCustomers(@RequestParam String keyword) {
         List<Customer> customers = customerService.searchByName(keyword);
         return ResponseEntity.ok(customers);
+    }
+
+    // API import file excel
+    @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<?> importExcel(
+            @RequestParam("file") MultipartFile file
+    )
+            throws IOException {
+        List<Customer> response = customerService.importExcel(file);
+        return ResponseEntity.ok().body(new BaseResponse<>(response));
+    }
+
+    @GetMapping("sampleExcel")
+    public ResponseEntity<?> getSampleExcel() throws IOException {
+        Map<String, String> response = customerService.getSampleExcel();
+        return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 }
