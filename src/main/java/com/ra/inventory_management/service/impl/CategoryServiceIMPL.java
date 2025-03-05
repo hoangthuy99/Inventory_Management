@@ -1,24 +1,31 @@
 package com.ra.inventory_management.service.impl;
 
 
+import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.ProductInfo;
 import com.ra.inventory_management.reponsitory.CategoryRepository;
 import com.ra.inventory_management.sercurity.exception.ResourceNotFoundException;
 import com.ra.inventory_management.service.CategoryService;
 import com.ra.inventory_management.util.ExcelUtil;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CategoryServiceIMPL implements CategoryService {
@@ -110,6 +117,39 @@ public class CategoryServiceIMPL implements CategoryService {
             }
 
             return categoryRepository.saveAll(categoriesList);
+        } catch (IOException e) {
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateKeyException("Dữ liệu bị trùng lặp");
+        }
+    }
+
+    @Override
+    public Map<String, String> getSampleExcel() throws IOException {
+        try {
+            // Get file from resource
+            ClassPathResource pathResource = new ClassPathResource(Constant.CATEGORY_SAMPLE);
+            if (!pathResource.exists()) {
+                throw new FileNotFoundException("Không tìm thấy file: " + pathResource.getPath());
+            }
+
+            // Copy file to temp folder
+            Path tempFile = Files.createTempFile("sample_category", ".xlsx");
+            Files.copy(pathResource.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+
+            // Convert base64
+            byte[] fileContent = Files.readAllBytes(tempFile);
+            String base64Encoded = Base64.encodeBase64String(fileContent);
+
+
+            // Remove file temp after write
+            Files.deleteIfExists(tempFile);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("fileName", "sample_category");
+            response.put("base64", "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + base64Encoded);
+
+            return response;
         } catch (IOException e) {
             throw e;
         }

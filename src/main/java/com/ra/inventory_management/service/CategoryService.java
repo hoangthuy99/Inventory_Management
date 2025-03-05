@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface CategoryService {
     List<Categories> getAll();
@@ -24,4 +25,6 @@ public interface CategoryService {
     List<Categories> searchByName(String keyword);
 
     List<Categories> importExcel(MultipartFile file) throws IOException;
+
+    Map<String, String> getSampleExcel() throws IOException;
 }

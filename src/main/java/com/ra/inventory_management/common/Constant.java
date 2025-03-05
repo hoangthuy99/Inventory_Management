@@ -23,4 +23,6 @@ public class Constant {
     // Sample excel file import
     public static final String PRODUCT_SAMPLE = "/sample-excel/product.xlsx";
     public static final String CATEGORY_SAMPLE = "/sample-excel/category.xlsx";
+    public static final String CUSTOMER_SAMPLE = "/sample-excel/customer.xlsx";
+    public static final String BRANCH_SAMPLE = "/sample-excel/branch.xlsx";
 }

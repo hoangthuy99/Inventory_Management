@@ -133,7 +133,8 @@ public class CategoryController {
     }
 
     @GetMapping("sampleExcel")
-    public ResponseEntity<?> getSampleExcel() {
-        return ResponseEntity.ok().body(new BaseResponse<>("/uploads" + Constant.CATEGORY_SAMPLE));
+    public ResponseEntity<?> getSampleExcel() throws IOException {
+        Map<String, String> response = categoryService.getSampleExcel();
+        return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 }
