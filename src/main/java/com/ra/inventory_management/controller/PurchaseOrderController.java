@@ -36,13 +36,13 @@ public class PurchaseOrderController {
     }
 
     @DeleteMapping("deleteById/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Integer id){
+    public ResponseEntity<?> deleteById(@PathVariable Long id){
         purchaseOrderService.deletePurchase(id);
         return ResponseEntity.ok().body(new BaseResponse<>(null));
     }
 
     @GetMapping("getById/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id){
+    public ResponseEntity<?> getById(@PathVariable Long id){
         PurchaseOrder order = purchaseOrderService.getById(id);
         return ResponseEntity.ok().body(new BaseResponse<>(order));
     }

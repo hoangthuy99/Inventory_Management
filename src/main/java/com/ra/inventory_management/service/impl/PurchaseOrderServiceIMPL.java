@@ -144,7 +144,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
 
 
             PurchaseOrderItem item = PurchaseOrderItem.builder()
-                    .id(itemRequest.getId())
+                    .id(Long.valueOf(itemRequest.getId()))
                     .purchaseOrder(order)
                     .createdAt(LocalDateTime.now())
                     .quantityActual(itemRequest.getQuantityActual())
@@ -192,7 +192,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
     }
 
     @Override
-    public void deletePurchase(int id) {
+    public void deletePurchase(Long id) {
         log.info("start: searchPurchaseOrder");
 
         PurchaseOrder order = purchaseOrderRepository.findById(id)
@@ -208,7 +208,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
 
 
     @Override
-    public PurchaseOrder getById(int id) {
+    public PurchaseOrder getById(Long id) {
         log.info("start: getById");
 
         PurchaseOrder order = purchaseOrderRepository.findById(id)

@@ -9,6 +9,6 @@ public interface PurchaseOrderService {
     PurchaseOrder createPurchaseOrder(PurchaseOrderRequest request);
     PurchaseOrder updatePurchaseOrder(PurchaseOrderRequest request);
     List<PurchaseOrder> searchPurchaseOrder();
-    void deletePurchase(int id);
-    PurchaseOrder getById(int id);
+    void deletePurchase(Long id);
+    PurchaseOrder getById(Long id);
 }

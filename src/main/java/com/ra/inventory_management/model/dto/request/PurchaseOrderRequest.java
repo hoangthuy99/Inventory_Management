@@ -6,13 +6,13 @@ import java.util.List;
 
 @Data
 public class PurchaseOrderRequest {
-    private Integer id;
+    private Long id;
 
-    private Integer supplierId;
+    private Long supplierId;
 
     private LocalDateTime orderDate;
 
-    private Integer branchId;
+    private Long branchId;
 
     private LocalDateTime orderDatePlan;
 
