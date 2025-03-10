@@ -36,9 +36,8 @@ public class OrderServiceIMPL implements OrderService {
 
     @Override
     public List<Orders> getAll(Long customId) {
-        return orderRepository.findAllByCustomerId(customId) ;
+        return orderRepository.findAllByCustomerId(customId);
     }
-
 
 
     @Override
@@ -72,6 +71,7 @@ public class OrderServiceIMPL implements OrderService {
         order.setNote(request.getNote());
         order.setStatus(EOrderStatus.PENDING);
         order.setCreatedDate(LocalDateTime.now());
+        order.setDeleteFg(false);
 
         // Tạo danh sách orderDetails
         List<OrderDetails> items = new ArrayList<>();
@@ -99,8 +99,6 @@ public class OrderServiceIMPL implements OrderService {
     }
 
 
-
-
     @Override
     public Optional<Orders> findById(Long id) {
         return orderRepository.findById(id);
@@ -108,7 +106,7 @@ public class OrderServiceIMPL implements OrderService {
 
     @Override
     public Orders getByIdAndStatus(Long customerId, Long orderId, EOrderStatus status) {
-        return (Orders) orderRepository.findByCustomerIdAndStatus(customerId,orderId,1);
+        return (Orders) orderRepository.findByCustomerIdAndStatus(customerId, orderId, 1);
     }
 
     @Override

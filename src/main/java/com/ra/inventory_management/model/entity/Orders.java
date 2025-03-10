@@ -66,7 +66,7 @@ public class Orders {
     @Column(name = "delete_fg", nullable = false)
     private Boolean deleteFg;
 
-    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Where(clause = "delete_fg = false OR delete_fg IS NULL")
     private List<OrderDetails> orderDetails;
 
