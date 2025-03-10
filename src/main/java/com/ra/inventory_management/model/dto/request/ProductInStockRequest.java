@@ -17,7 +17,7 @@ public class ProductInStockRequest {
 
 
     @Min(value = 0, message = "Số lượng không được nhỏ hơn 0")
-    private int quantity;
+    private int qty;
 
     @NotNull(message = "Hãy chọn mã  sản phẩm")
     private Long productId;

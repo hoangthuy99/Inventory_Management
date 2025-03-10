@@ -36,14 +36,14 @@ public class OrderDetailController {
     }
 
     // Thêm mới OrderDetails
-    @PostMapping("/{orderId}/add-detail")
+    @PostMapping("/{orderId}/add")
     public ResponseEntity<Orders> addOrderDetail(@PathVariable Long orderId, @RequestBody OrderDetails detail) {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
         detail.setOrder(order); // Liên kết chi tiết với đơn hàng
         order.getOrderDetails().add(detail); // Thêm vào danh sách chi tiết đơn hàng
-        order.calculateTotalPrice(); // Cập nhật tổng tiền
+
 
         orderRepository.save(order); // Lưu đơn hàng đã cập nhật
         return ResponseEntity.ok(order);

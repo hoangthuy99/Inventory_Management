@@ -1,5 +1,6 @@
 package com.ra.inventory_management.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,6 +43,7 @@ public class ProductInfo {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cate_id", nullable = false)
+    @JsonIgnore
     @ToString.Exclude
     private Categories categories;
 

@@ -1,6 +1,8 @@
 package com.ra.inventory_management.model.dto.request;
 
 import com.ra.inventory_management.common.EOrderStatus;
+import com.ra.inventory_management.model.entity.Users;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,12 +20,17 @@ public class OrderRequest {
     private Long customerId;
     private Long branchId;
     private BigDecimal totalPrice;
-    private EOrderStatus status;
+    private EOrderStatus status = EOrderStatus.PENDING;
     private LocalDateTime plannedExportDate;
+    private LocalDateTime actualExportDate;
+    private String deliveryAddress;
+    private String note;
     private String orderCode;
-    private List<OrderDetailRequest> orderDetails;
+    private List<OrderDetailRequest> orderDetailsRequest;
+//    private Users users;
     public BigDecimal getTotalPrice() {
         return totalPrice != null ? totalPrice : BigDecimal.ZERO;
     }
+
 
 }

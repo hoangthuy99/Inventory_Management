@@ -4,7 +4,9 @@ import com.ra.inventory_management.common.ERoles;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -46,8 +48,8 @@ public class Roles {
     }
 
 
-    @OneToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Auth> auths;
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    private Set<Users> users = new HashSet<>();
 
 
 

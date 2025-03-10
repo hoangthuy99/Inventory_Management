@@ -1,9 +1,11 @@
 package com.ra.inventory_management.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "customer")
@@ -32,6 +34,9 @@ public class Customer {
     @Column(nullable = false, length = 255)
     private String address;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Orders> orders;
 
     @Column(name = "active_flag", nullable = false)
     private int activeFlag;

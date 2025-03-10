@@ -73,7 +73,8 @@ public class ProductServiceIMPL implements ProductService {
 
         @Override
     public ProductInfo findById(Long id) {
-        return productRepository.findById(id).orElse(null);
+            ProductInfo product= productRepository.findById(id).orElse(null);
+        return product;
     }
 
     @Override

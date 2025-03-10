@@ -3,18 +3,18 @@ package com.ra.inventory_management.service.impl;
 import com.ra.inventory_management.common.EOrderStatus;
 import com.ra.inventory_management.model.dto.request.OrderDetailRequest;
 import com.ra.inventory_management.model.dto.request.OrderRequest;
-import com.ra.inventory_management.model.entity.Branch;
-import com.ra.inventory_management.model.entity.Customer;
-import com.ra.inventory_management.model.entity.OrderDetails;
-import com.ra.inventory_management.model.entity.Orders;
+import com.ra.inventory_management.model.dto.request.PurchaseOrderItemRequest;
+import com.ra.inventory_management.model.entity.*;
 import com.ra.inventory_management.reponsitory.*;
+import com.ra.inventory_management.service.AuthService;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Relation;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class OrderServiceIMPL implements OrderService {
@@ -28,6 +28,12 @@ public class OrderServiceIMPL implements OrderService {
     private ProductRepository productRepository;
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+    private final AuthService authService;
+
+    public OrderServiceIMPL(AuthService authService) {
+        this.authService = authService;
+    }
+
     @Override
     public List<Orders> getAll(Long customId) {
         return orderRepository.findAllByCustomerId(customId) ;
@@ -36,41 +42,63 @@ public class OrderServiceIMPL implements OrderService {
 
 
     @Override
-    public Orders save(OrderRequest orderRequest) {
-        // Tạo mới một đơn hàng từ request
+    public Orders save(OrderRequest request) {
         Orders order = new Orders();
-        // Thiết lập dữ liệu từ OrderRequest vào Orders
-        order.setOrderCode(orderRequest.getOrderCode());
-        order.setStatus(orderRequest.getStatus());
-        order.setTotalPrice(orderRequest.getTotalPrice());
-        // Lấy thông tin khách hàng từ database
-        Customer customer = customerRepository.findById(orderRequest.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
-        order.setCustomer(customer);
+        order.setOrderCode(Orders.generateOrderCode());
 
-        // Lấy thông tin chi nhánh nếu có
-        if (orderRequest.getBranchId() != null) {
-            Branch branch = branchRepository.findById(orderRequest.getBranchId())
-                    .orElseThrow(() -> new RuntimeException("Chi nhánh không tồn tại"));
-            order.setBranch(branch);
+        // Kiểm tra và lấy thông tin khách hàng
+        order.setCustomer(customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại")));
+
+        // Kiểm tra và lấy thông tin chi nhánh
+        order.setBranch(branchRepository.findById(request.getBranchId())
+                .orElseThrow(() -> new RuntimeException("Chi nhánh không tồn tại")));
+
+        // Kiểm tra ngày xuất kho kế hoạch
+        LocalDateTime now = LocalDateTime.now();
+        if (request.getPlannedExportDate().isBefore(now)) {
+            throw new RuntimeException("Ngày xuất kho kế hoạch phải từ hôm nay trở đi.");
+        }
+        order.setPlannedExportDate(request.getPlannedExportDate());
+
+        // Kiểm tra ngày xuất kho thực tế (nếu có)
+        if (request.getActualExportDate() != null && request.getActualExportDate().isBefore(now)) {
+            throw new RuntimeException("Ngày xuất kho thực tế phải từ hôm nay trở đi.");
+        }
+        order.setActualExportDate(request.getActualExportDate());
+
+        // Gán các thông tin khác
+        order.setDeliveryAddress(request.getDeliveryAddress());
+        order.setNote(request.getNote());
+        order.setStatus(EOrderStatus.PENDING);
+        order.setCreatedDate(LocalDateTime.now());
+
+        // Tạo danh sách orderDetails
+        List<OrderDetails> items = new ArrayList<>();
+        for (OrderDetailRequest itemRequest : request.getOrderDetailsRequest()) {
+            ProductInfo productInfo = productRepository.findById(itemRequest.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với id: " + itemRequest.getProductId()));
+
+            OrderDetails orderDetails = OrderDetails.builder()
+                    .order(order)
+                    .createdAt(LocalDateTime.now())
+                    .quantity(itemRequest.getQuantity())
+                    .productInfo(productInfo)
+                    .itemUnit(itemRequest.getItemUnit())
+                    .unitPrice(productInfo.getPrice())
+                    .build();
+
+            items.add(orderDetails);
         }
 
-        order.setPlannedExportDate(orderRequest.getPlannedExportDate());
+        // Gán danh sách orderDetails vào order
+        order.setOrderDetails(items);
 
-            order.calculateTotalPrice(); // Gọi hàm tính tổng tiền trước khi lưu
-             orderRepository.save(order);
-        for (OrderDetailRequest detail : orderRequest.getOrderDetails()) {
-            OrderDetails orderDetail = new OrderDetails();
-            orderDetail.setOrder(order);
-            orderDetail.setProductInfo(productRepository.findById(detail.getProductId()).orElseThrow());
-            orderDetail.setQuantity(detail.getQuantity());
-            orderDetail.setUnitPrice(detail.getUnitPrice());
-            orderDetailRepository.save(orderDetail);
-        }
-
-        return order;
-
+        // Lưu vào database
+        return orderRepository.save(order);
     }
+
+
 
 
     @Override

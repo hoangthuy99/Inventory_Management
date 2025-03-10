@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor
@@ -65,6 +67,7 @@ public class Users implements UserDetails {
         updateDate = LocalDateTime.now();
     }
 
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
@@ -73,11 +76,20 @@ public class Users implements UserDetails {
     )
     private Set<Roles> roles = new HashSet<>();
 
+    //  Hàm này giúp lấy danh sách tên role của user
+    public Set<String> getRoleNames() {
+        return roles.stream()
+                .map(role -> role.getRoleName().name())
+                .collect(Collectors.toSet());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public boolean isAccountNonExpired() {
@@ -100,4 +112,6 @@ public class Users implements UserDetails {
         return true;
 
     }
+
+
 }

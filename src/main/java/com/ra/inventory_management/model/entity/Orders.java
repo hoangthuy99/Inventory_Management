@@ -1,12 +1,16 @@
 package com.ra.inventory_management.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ra.inventory_management.common.EOrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,20 +39,37 @@ public class Orders {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private EOrderStatus status;
+    private EOrderStatus status = EOrderStatus.PENDING;
 
     @Column(name = "planned_export_date", nullable = false)
     private LocalDateTime plannedExportDate;
 
+    @Column(name = "actual_export_date")
+    private LocalDateTime actualExportDate;
+
+    @Column(name = "delivery_address", nullable = false)
+    private String deliveryAddress;
+
+    @Column(name = "note")
+    private String note;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private Users users;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
 
     @Column(name = "update_date")
+    @JsonIgnore
     private LocalDateTime updateDate;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<OrderDetails> orderDetails = new HashSet<>();
+    @Column(name = "delete_fg", nullable = false)
+    private Boolean deleteFg;
+
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
+    @Where(clause = "delete_fg = false OR delete_fg IS NULL")
+    private List<OrderDetails> orderDetails;
+
 
     @PrePersist
     protected void onCreate() {
@@ -59,18 +80,10 @@ public class Orders {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
-    private String generateOrderCode() {
+
+    public static String generateOrderCode() {
         return "OD" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8).toUpperCase();
     }
-    public void calculateTotalPrice() {
-        if (orderDetails == null || orderDetails.isEmpty()) {
-            this.totalPrice = BigDecimal.ZERO;
-            return;
-        }
-        this.totalPrice = orderDetails.stream()
-                .filter(detail -> detail.getUnitPrice() != null && detail.getQuantity() != null) // Kiểm tra null
-                .map(detail -> detail.getUnitPrice().multiply(BigDecimal.valueOf(detail.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+
 
 }

@@ -30,7 +30,6 @@ public class Categories {
 
     @OneToMany(mappedBy = "categories", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
-    @ToString.Exclude
     private List<ProductInfo> productInfo = new ArrayList<>();
 
     @Column(name = "active_flag", nullable = false)
