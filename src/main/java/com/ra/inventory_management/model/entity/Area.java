@@ -1,11 +1,9 @@
 package com.ra.inventory_management.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +14,7 @@ import lombok.Setter;
 public class Area {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
@@ -27,8 +26,7 @@ public class Area {
     private String description;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "location", nullable = false)
+    @Column(name = "location")
     private String location;
 
     @Size(max = 100)
@@ -36,4 +34,16 @@ public class Area {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "posX")
+    private Float posX;
+
+    @Column(name = "posY")
+    private Float posY;
+
+    @Column(name = "capacity")
+    private Integer capacity;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
 }
