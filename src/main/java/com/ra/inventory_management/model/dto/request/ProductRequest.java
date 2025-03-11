@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -21,7 +23,7 @@ public class ProductRequest {
 
     @NotNull(message = "Hãy nhập giá sản phẩm")
     @Positive(message = "Giá sản phẩm phải là số dương")
-    private Double price;
+    private BigDecimal price;
 
     @Min(value = 0, message = "Số lượng không được nhỏ hơn 0")
     private Integer qty;

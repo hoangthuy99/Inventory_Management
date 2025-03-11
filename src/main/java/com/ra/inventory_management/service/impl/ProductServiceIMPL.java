@@ -55,7 +55,7 @@ public class ProductServiceIMPL implements ProductService {
             product.setName(productRequest.getName());
             product.setCode(productRequest.getCode());
             product.setQty(productRequest.getQty());
-            product.setPrice(BigDecimal.valueOf(productRequest.getPrice()));
+            product.setPrice(productRequest.getPrice());
             product.setDescription(productRequest.getDescription());
             product.setActiveFlag(productRequest.getActiveFlag() != null ? productRequest.getActiveFlag() : 1);
             product.setCategories(category);
