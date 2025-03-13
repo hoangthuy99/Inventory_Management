@@ -47,7 +47,7 @@ public class ProductInfo {
     @ToString.Exclude
     private Categories categories;
 
-    @Column(name = "qty", nullable = false)
+    @Column(name = "quantity", nullable = false)
     private Integer qty;
 
     @Column(name = "price", precision = 15, scale = 2, nullable = false)

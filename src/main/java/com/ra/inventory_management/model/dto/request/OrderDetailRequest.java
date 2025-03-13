@@ -18,9 +18,9 @@ import java.time.LocalDateTime;
 @Builder
 public class OrderDetailRequest {
     private Long productId;
-    private Integer quantity;
+    private Integer qty;
     private BigDecimal unitPrice;
-    private Integer itemUnit;
+    private Integer productUnit;
     private LocalDateTime createdAt;
 //    private Users createdBy;
     private LocalDateTime updatedAt;

@@ -30,10 +30,10 @@ public class OrderDetails {
     @JoinColumn(name = "product_id", nullable = false)
     private ProductInfo productInfo;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
-    @Column(name = "item_unit")
-    private Integer itemUnit;
+    @Column(name = "qty", nullable = false)
+    private Integer qty = 0;  // Thêm giá trị mặc định
+    @Column(name = "product_unit")
+    private Integer productUnit;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal unitPrice;

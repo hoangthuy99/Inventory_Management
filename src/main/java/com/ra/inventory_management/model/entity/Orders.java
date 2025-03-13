@@ -1,17 +1,15 @@
 package com.ra.inventory_management.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ra.inventory_management.common.EOrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -27,9 +25,11 @@ public class Orders {
 
     @Column(name = "order_code", length = 10, unique = true, nullable = false)
     private String orderCode;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
+
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private Branch branch;
@@ -52,9 +52,6 @@ public class Orders {
 
     @Column(name = "note")
     private String note;
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private Users users;
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -63,27 +60,37 @@ public class Orders {
     @JsonIgnore
     private LocalDateTime updateDate;
 
-    @Column(name = "delete_fg", nullable = false)
+    @ColumnDefault("b'0'")
+    @Column(name = "delete_fg")
     private Boolean deleteFg;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Where(clause = "delete_fg = false OR delete_fg IS NULL")
     private List<OrderDetails> orderDetails;
-
 
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();
+        calculateTotalPrice();
     }
 
     @PreUpdate
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
+        calculateTotalPrice();
     }
 
     public static String generateOrderCode() {
         return "OD" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8).toUpperCase();
     }
 
-
+    public void calculateTotalPrice() {
+        if (orderDetails != null && !orderDetails.isEmpty()) {
+            this.totalPrice = orderDetails.stream()
+                    .map(orderDetail -> orderDetail.getUnitPrice().multiply(BigDecimal.valueOf(orderDetail.getQty())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        } else {
+            this.totalPrice = BigDecimal.ZERO;
+        }
+    }
 }

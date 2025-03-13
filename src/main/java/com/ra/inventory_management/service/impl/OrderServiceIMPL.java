@@ -34,11 +34,18 @@ public class OrderServiceIMPL implements OrderService {
         this.authService = authService;
     }
 
+
+
+
     @Override
-    public List<Orders> getAll(Long customId) {
+    public List<Orders> getAllByCus(Long customId) {
         return orderRepository.findAllByCustomerId(customId);
     }
 
+    @Override
+    public List<Orders> getAll() {
+        return orderRepository.findAllActiveOrders(true);
+    }
 
     @Override
     public Orders save(OrderRequest request) {
@@ -71,7 +78,7 @@ public class OrderServiceIMPL implements OrderService {
         order.setNote(request.getNote());
         order.setStatus(EOrderStatus.PENDING);
         order.setCreatedDate(LocalDateTime.now());
-        order.setDeleteFg(false);
+        order.setDeleteFg(true);
 
         // Tạo danh sách orderDetails
         List<OrderDetails> items = new ArrayList<>();
@@ -82,9 +89,9 @@ public class OrderServiceIMPL implements OrderService {
             OrderDetails orderDetails = OrderDetails.builder()
                     .order(order)
                     .createdAt(LocalDateTime.now())
-                    .quantity(itemRequest.getQuantity())
+                    .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0)  // Kiểm tra NULL
                     .productInfo(productInfo)
-                    .itemUnit(itemRequest.getItemUnit())
+                    .productUnit(itemRequest.getProductUnit())
                     .unitPrice(productInfo.getPrice())
                     .build();
 
@@ -113,4 +120,18 @@ public class OrderServiceIMPL implements OrderService {
     public List<Orders> searchByOrderCode(String keyword) {
         return orderRepository.searchByOrderCode(keyword);
     }
+
+    @Override
+    public List<Orders> findByDeleteFg(Boolean deleteFg) {
+        return orderRepository.findAllActiveOrders(true);
+    }
+
+    @Override
+    public void deleteOr(Long orderId) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+        order.setDeleteFg(false); // Đánh dấu là đã xóa
+        orderRepository.save(order);
+    }
+
 }
