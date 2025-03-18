@@ -35,4 +35,10 @@ public class AreaController {
         List<Area> areas = areaService.createOrUpdate(requests, branchId);
         return ResponseEntity.ok().body(new BaseResponse<>(areas));
     }
+
+    @DeleteMapping("delete")
+    public ResponseEntity<?> delete(@RequestParam List<Integer> ids) {
+        Boolean deleted = areaService.deleteMulti(ids);
+        return ResponseEntity.ok().body(new BaseResponse<>(deleted));
+    }
 }

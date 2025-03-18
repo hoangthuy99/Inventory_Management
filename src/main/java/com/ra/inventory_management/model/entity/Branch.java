@@ -13,7 +13,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Branch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +20,7 @@ public class Branch {
 
     @Column(name = "branch_name", nullable = false, length = 100, unique = true)
     private String name;
+
     @Column(name = "branch_code", length = 50, unique = true, nullable = false)
     private String branchCode;
 
@@ -43,6 +43,7 @@ public class Branch {
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Orders> orders;
+
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();

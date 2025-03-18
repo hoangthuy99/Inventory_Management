@@ -2,13 +2,16 @@ package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.dto.request.CategoryRequest;
+import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.dto.response.BaseResponse;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.ProductInfo;
+import com.ra.inventory_management.model.entity.PurchaseOrder;
 import com.ra.inventory_management.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,14 @@ public class CategoryController {
     public ResponseEntity<List<Categories>> getCategories() {
         List<Categories> categoryList = categoryService.getAll();
         return ResponseEntity.ok(categoryList);
+    }
+
+    @PostMapping("searchCategories")
+    public ResponseEntity<?> searchCategories(
+            @RequestBody SearchRequest request
+    ) {
+        Page<Categories> categories = categoryService.searchCategories(request);
+        return ResponseEntity.ok().body(new BaseResponse<>(categories));
     }
 
     @PostMapping(value = "/add-category", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -25,10 +25,6 @@ public class Area {
     @Column(name = "description")
     private String description;
 
-    @Size(max = 255)
-    @Column(name = "location")
-    private String location;
-
     @Size(max = 100)
     @NotNull
     @Column(name = "name", nullable = false, length = 100)

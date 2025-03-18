@@ -6,12 +6,14 @@ import com.ra.inventory_management.model.entity.Branch;
 import com.ra.inventory_management.reponsitory.AreaRepository;
 import com.ra.inventory_management.reponsitory.BranchRepository;
 import com.ra.inventory_management.service.AreaService;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -54,7 +56,8 @@ public class AreaServiceIMPL implements AreaService {
         // prepare data
         List<Area> areas = requests.stream()
                 .map(data -> {
-                    Area area = new Area();
+                    Integer id = Optional.ofNullable(data.getId()).orElse(0);
+                    Area area = areaRepository.findById(id).orElse(new Area());
                     area.setId(data.getId());
                     area.setName(data.getName());
                     area.setCapacity(data.getCapacity());
@@ -71,5 +74,25 @@ public class AreaServiceIMPL implements AreaService {
         log.info("end: createOrUpdate");
 
         return storedAreas;
+    }
+
+    @Override
+    public Boolean deleteMulti(List<Integer> ids) {
+        log.info("start: delete");
+
+        List<Area> areas = new ArrayList<>();
+
+        for (Integer id : ids) {
+            Area area = areaRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Not found area by id: " + id));
+
+            areas.add(area);
+        }
+        // delete area
+        areaRepository.deleteAll(areas);
+
+        log.info("end: delete");
+
+        return true;
     }
 }

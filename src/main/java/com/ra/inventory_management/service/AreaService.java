@@ -12,4 +12,6 @@ public interface AreaService {
     List<Area> getByBranchId(Integer branchId);
 
     List<Area> createOrUpdate(List<AreaRequest> requests, Long branchId);
+
+    Boolean deleteMulti(List<Integer> id);
 }
