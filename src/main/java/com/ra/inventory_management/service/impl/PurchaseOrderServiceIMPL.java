@@ -3,11 +3,15 @@ package com.ra.inventory_management.service.impl;
 import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.dto.request.PurchaseOrderItemRequest;
 import com.ra.inventory_management.model.dto.request.PurchaseOrderRequest;
+import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.entity.*;
 import com.ra.inventory_management.reponsitory.*;
 import com.ra.inventory_management.service.PurchaseOrderService;
+import com.ra.inventory_management.util.PageableUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -48,20 +52,20 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
         // Create instant for purchase order
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         PurchaseOrder purchaseOrder = PurchaseOrder.builder()
-                        .orderDate(request.getOrderDate())
-                        .orderDatePlan(request.getOrderDatePlan())
-                        .supplier(supplier)
-                        .createdAt(LocalDateTime.now())
-                        .note(request.getNote())
-                        .status(Constant.PENDING)
-                        .branch(branch)
-                        .deleteFg(false)
-                        .code(String.format("PCO%s", LocalDateTime.now().format(formatter)))
-                        .build();
+                .orderDate(request.getOrderDate())
+                .orderDatePlan(request.getOrderDatePlan())
+                .supplier(supplier)
+                .createdAt(LocalDateTime.now())
+                .note(request.getNote())
+                .status(Constant.PENDING)
+                .branch(branch)
+                .deleteFg(false)
+                .code(String.format("PCO%s", LocalDateTime.now().format(formatter)))
+                .build();
 
         // Create instant for purchase order item
         List<PurchaseOrderItem> items = new ArrayList<>();
-        for(PurchaseOrderItemRequest itemRequest : request.getItems()) {
+        for (PurchaseOrderItemRequest itemRequest : request.getItems()) {
             // Get product by id if not found throw error
             ProductInfo productInfo = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found by id: " + itemRequest.getProductId()));
@@ -89,8 +93,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
         purchaseOrder.setPurchaseOrderItems(items);
 
         // Save purchase order
-        PurchaseOrder response =  purchaseOrderRepository.save(purchaseOrder);
-
+        PurchaseOrder response = purchaseOrderRepository.save(purchaseOrder);
 
 
         log.info("end: createPurchaseOrder");
@@ -127,17 +130,17 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
         List<PurchaseOrderItem> items = new ArrayList<>();
 
         // Remove remain order if can not found in request
-        for (PurchaseOrderItem item : order.getPurchaseOrderItems()){
+        for (PurchaseOrderItem item : order.getPurchaseOrderItems()) {
             if (
                     !request.getItems().stream().anyMatch(i -> item.getId().equals(i.getId()))
-            ){
+            ) {
                 item.setDeleteFg(true);
                 items.add(item);
             }
         }
 
         // Create or modifed already order
-        for(PurchaseOrderItemRequest itemRequest : request.getItems()) {
+        for (PurchaseOrderItemRequest itemRequest : request.getItems()) {
             // Get product by id if not found throw error
             ProductInfo productInfo = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found by id: " + itemRequest.getProductId()));
@@ -159,9 +162,9 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
                     )
                     .build();
 
-            if (item.getId() != null){
+            if (item.getId() != null) {
                 item.setUpdatedAt(LocalDateTime.now());
-            }else{
+            } else {
                 item.setCreatedAt(LocalDateTime.now());
             }
 
@@ -173,18 +176,19 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
         order.setPurchaseOrderItems(items);
 
         // Save purchase order
-        PurchaseOrder response =  purchaseOrderRepository.save(order);
+        PurchaseOrder response = purchaseOrderRepository.save(order);
 
         log.info("end: updatePurchaseOrder");
         return response;
     }
 
     @Override
-    public List<PurchaseOrder> searchPurchaseOrder() {
+    public Page<PurchaseOrder> searchPurchaseOrder(SearchRequest request) {
         log.info("start: searchPurchaseOrder");
 
-        List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll()
-                .stream().filter(p -> !p.getDeleteFg()).toList();
+        Pageable pageable = PageableUtil.create(request.getPageNum(), request.getPageSize(), request.getSortBy(), request.getSortType());
+
+        Page<PurchaseOrder> purchaseOrders = purchaseOrderRepository.searchPurchase(request.getSearchKey(), request.getStatus(), pageable);
 
         log.info("end: searchPurchaseOrder");
 

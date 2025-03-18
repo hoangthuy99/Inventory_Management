@@ -1,8 +1,10 @@
 package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.common.EOrderStatus;
+import com.ra.inventory_management.model.dto.request.OrderRequest;
 import com.ra.inventory_management.model.entity.Customer;
 import com.ra.inventory_management.model.entity.Orders;
+import com.ra.inventory_management.reponsitory.OrderRepository;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,23 +20,19 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    // Lấy danh sách đơn hàng theo customerId
-    @GetMapping("/all/{customerId}")
-    public ResponseEntity<List<Orders>> getAllOrders(@PathVariable Long customerId) {
-        return ResponseEntity.ok(orderService.getAll(customerId));
+
+    @GetMapping("/")
+    public ResponseEntity<List<Orders>> getAll(@RequestParam(required = false) Long customerId) {
+        if (customerId != null) {
+            return ResponseEntity.ok(orderService.getAllByCus(customerId));
+        }
+        return ResponseEntity.ok(orderService.getAll());
     }
 
-    // Thêm đơn hàng mới
-    @PostMapping("/add")
-    public ResponseEntity<Orders> addOrder(@RequestBody Customer customer, @RequestParam BigDecimal totalPrice) {
-        Orders newOrder = orderService.add(customer, totalPrice);
-        return ResponseEntity.ok(newOrder);
-    }
-
-    // Lưu hoặc cập nhật đơn hàng
     @PostMapping("/save")
-    public ResponseEntity<Orders> saveOrder(@RequestBody Orders orders) {
-        Orders savedOrder = orderService.save(orders);
+    public ResponseEntity<Orders> saveOrder(@RequestBody OrderRequest orderRequest) {
+        System.out.println("Dữ liệu nhận được: " + orderRequest);
+        Orders savedOrder = orderService.save(orderRequest);
         return ResponseEntity.ok(savedOrder);
     }
 
@@ -61,4 +59,12 @@ public class OrderController {
     public ResponseEntity<List<Orders>> searchByOrderCode(@RequestParam String keyword) {
         return ResponseEntity.ok(orderService.searchByOrderCode(keyword));
     }
+
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<?> restoreOrder(@PathVariable Long id) {
+        orderService.findByDeleteFg(true);
+        return ResponseEntity.ok("Đơn hàng đã khôi phục thành công!");
+    }
+
+
 }

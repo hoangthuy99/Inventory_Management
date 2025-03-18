@@ -2,12 +2,16 @@ package com.ra.inventory_management.service.impl;
 
 
 import com.ra.inventory_management.common.Constant;
+import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.ProductInfo;
+import com.ra.inventory_management.model.entity.PurchaseOrder;
 import com.ra.inventory_management.reponsitory.CategoryRepository;
 import com.ra.inventory_management.sercurity.exception.ResourceNotFoundException;
 import com.ra.inventory_management.service.CategoryService;
 import com.ra.inventory_management.util.ExcelUtil;
+import com.ra.inventory_management.util.PageableUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -15,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class CategoryServiceIMPL implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
@@ -153,5 +160,18 @@ public class CategoryServiceIMPL implements CategoryService {
         } catch (IOException e) {
             throw e;
         }
+    }
+
+    @Override
+    public Page<Categories> searchCategories(SearchRequest request) {
+        log.info("start: searchCategories");
+
+        Pageable pageable = PageableUtil.create(request.getPageNum(), request.getPageSize(), request.getSortBy(), request.getSortType());
+
+        Page<Categories> categories = categoryRepository.searchCategories(request.getSearchKey(), request.getStatus(), pageable);
+
+        log.info("end: searchCategories");
+
+        return categories;
     }
 }
