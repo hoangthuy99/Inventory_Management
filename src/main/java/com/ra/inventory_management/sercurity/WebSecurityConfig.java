@@ -56,8 +56,8 @@ public class WebSecurityConfig {
                 authorizeHttpRequests(
                         (auth)->auth
                                 .requestMatchers("/**").permitAll()
-//                                .requestMatchers("/categories/**").permitAll()
-//                                .requestMatchers("/products/**").permitAll()
+                                .requestMatchers("/categories/**").permitAll()
+                                .requestMatchers("/products/**").permitAll()
 //                                .requestMatchers("/admin/**").hasAuthority(String.valueOf(ERoles.ROLE_ADMIN))
 //                                .requestMatchers("/user/**").hasAuthority(String.valueOf(ERoles.ROLE_STAFF))
                                 .anyRequest().authenticated()

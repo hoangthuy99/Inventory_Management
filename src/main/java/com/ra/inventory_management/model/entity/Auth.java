@@ -5,12 +5,12 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

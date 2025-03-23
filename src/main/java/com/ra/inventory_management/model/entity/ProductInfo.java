@@ -5,14 +5,12 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
+@Entity
 public class ProductInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

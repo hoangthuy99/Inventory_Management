@@ -33,21 +33,6 @@ public class AuthController {
     private final AuthService authService;
 
 
-//    @PostMapping("register")
-//    public String save(@Valid @ModelAttribute("user") RegisterRequest registerRequest, BindingResult bindingResult, Model model) {
-//        if (bindingResult.hasErrors()) {
-//            return "auth/register";
-//        }
-//
-//        try {
-//            userService.handleRegister(registerRequest);
-//        } catch (IllegalArgumentException e) {
-//            model.addAttribute("err", e.getMessage());
-//            return "auth/register";
-//        }
-//
-//        return "redirect:/login";
-//    }
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         JwtResponse response = authService.login(request.getUsername(), request.getPassword());

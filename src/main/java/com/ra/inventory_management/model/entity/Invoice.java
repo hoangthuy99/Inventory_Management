@@ -5,12 +5,12 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
 @Table(name = "invoice")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

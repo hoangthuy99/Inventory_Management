@@ -3,14 +3,13 @@ package com.ra.inventory_management.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
 @Table(name = "area")
+@Entity
 public class Area {
     @Id
     @Column(name = "id", nullable = false)
