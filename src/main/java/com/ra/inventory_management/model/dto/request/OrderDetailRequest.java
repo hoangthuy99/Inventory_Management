@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OrderDetailRequest {
+    private Long id;
     private Long productId;
     private Integer qty;
     private BigDecimal unitPrice;
@@ -25,4 +26,5 @@ public class OrderDetailRequest {
     //    private Users createdBy;
     private LocalDateTime updatedAt;
     private Boolean deleteFg;
+
 }

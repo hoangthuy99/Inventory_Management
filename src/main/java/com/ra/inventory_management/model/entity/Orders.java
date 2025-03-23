@@ -1,7 +1,6 @@
 package com.ra.inventory_management.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ra.inventory_management.common.EOrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,12 +11,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 @Table(name = "orders")
+@Entity
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,8 +38,7 @@ public class Orders {
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EOrderStatus status = EOrderStatus.PENDING;
+    private Integer status = 1 ;
 
     @Column(name = "planned_export_date", nullable = false)
     private LocalDateTime plannedExportDate;

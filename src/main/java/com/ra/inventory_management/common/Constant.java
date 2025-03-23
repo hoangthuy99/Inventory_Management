@@ -20,6 +20,17 @@ public class Constant {
     public static final Integer REJECTED = 3;
     public static final Integer CANCELED = 4;
 
+    // Good Issue Status
+    public static final Integer ISSUE_PENDING = 1; // Chờ duyệt
+    public static final Integer ISSUE_CONFIRMED = 2; // Đã duyệt
+    public static final Integer ISSUE_REJECTED = 3; // Từ chối
+    public static final Integer ISSUE_PICKING = 4; // Đang chọn hàng
+    public static final Integer ISSUE_PACKING = 5; // Đang đóng gói
+    public static final Integer ISSUE_WAITING_FOR_SHIPMENT = 6; // Đang chờ giao
+    public static final Integer ISSUE_SHIPPED = 7; // Đã giao
+    public static final Integer ISSUE_CANCELED = 8; // Đã hủy
+    public static final Integer ISSUE_COMPLETED = 9; // Đã hoàn thành
+
     // Sample excel file import
     public static final String PRODUCT_SAMPLE = "/sample-excel/product.xlsx";
     public static final String CATEGORY_SAMPLE = "/sample-excel/category.xlsx";

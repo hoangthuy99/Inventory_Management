@@ -14,11 +14,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
+@Entity
+@Table
 public class Users implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

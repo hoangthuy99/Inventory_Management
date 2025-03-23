@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
+@Entity
 public class Categories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

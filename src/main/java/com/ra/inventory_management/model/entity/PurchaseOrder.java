@@ -8,17 +8,15 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
-@Entity
 @Table(name = "purchase_order")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class PurchaseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
