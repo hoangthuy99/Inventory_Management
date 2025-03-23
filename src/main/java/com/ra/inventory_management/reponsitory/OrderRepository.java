@@ -1,6 +1,8 @@
 package com.ra.inventory_management.reponsitory;
 
+import com.ra.inventory_management.common.EOrderStatus;
 import com.ra.inventory_management.model.entity.Orders;
+import jakarta.persistence.Tuple;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,5 +29,19 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     @Query("SELECT o FROM Orders o WHERE o.deleteFg = :deleteFg")
     List<Orders> findAllActiveOrders(@Param("deleteFg") Boolean deleteFg);
 
+    @Query("""
+                select sum(o.totalPrice) from Orders o where o.status = :status
+            """)
+    Double getTotalRevenue(@Param("status") EOrderStatus status);
 
+    @Query("""
+                select o.status as status, sum(o.id) as total from Orders o where o.status in (:orderStatus) group by o.status
+            """)
+    List<Tuple> getTotalOrderStatus(@Param("orderStatus") List<EOrderStatus> orderStatus);
+
+
+    @Query("""
+            select o from Orders o where o.status = :status
+            """)
+    List<Tuple> getTotalRevenue(@Param("filterType") Integer filterType);
 }

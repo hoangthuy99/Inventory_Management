@@ -1,5 +1,6 @@
 package com.ra.inventory_management.reponsitory;
 
+import com.ra.inventory_management.common.EOrderStatus;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.ProductInfo;
 
@@ -16,8 +17,10 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<ProductInfo, Long> {
     @Query("SELECT pro from ProductInfo pro WHERE pro.name like %?1% ")
     List<ProductInfo> findByNameOrDescription(String name, String description);
+
     @Query("SELECT p from ProductInfo p WHERE p.name like %?1% ")
-    List<ProductInfo> searchProductByName (String keyword);
+    List<ProductInfo> searchProductByName(String keyword);
+
     @Query("SELECT p FROM ProductInfo p WHERE p.categories.activeFlag = :activeFlag")
     Page<ProductInfo> findByCategoriesAndActiveFlag(Pageable pageable, @Param("activeFlag") Integer activeFlag);
 
@@ -31,5 +34,18 @@ public interface ProductRepository extends JpaRepository<ProductInfo, Long> {
     boolean existsByName(String name);
 
     int countByCategories(Categories category);
+
+    @Query("""
+                select count(p.id) from ProductInfo p
+            """)
+    Integer getTotalProducts();
+
+    @Query("""
+            select p.id from ProductInfo p 
+            where p.id = (
+            select od.productInfo.id from OrderDetails od where od.qty > p.qty and od.order.status in (:orderStatus)
+            )
+            """)
+    List<Integer> getLowStockProducts(@Param("orderStatus") List<EOrderStatus> orderStatus);
 
 }

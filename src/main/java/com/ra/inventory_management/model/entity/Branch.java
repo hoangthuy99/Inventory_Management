@@ -24,11 +24,14 @@ public class Branch {
     @Column(name = "branch_code", length = 50, unique = true, nullable = false)
     private String branchCode;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "address", nullable = false, length = 255)
     private String address;
 
-    @Column(nullable = false, length = 15, unique = true)
+    @Column(name = "phone", nullable = false, length = 15, unique = true)
     private String phone;
+
+    @Column(name = "map_image", nullable = false, length = 15, unique = true)
+    private String mapImage;
 
     @Column(name = "active_flag", nullable = false)
     private Integer activeFlag;

@@ -90,7 +90,7 @@ public class OrderServiceIMPL implements OrderService {
                     .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0)  // Kiểm tra NULL
                     .productInfo(productInfo)
                     .productUnit(itemRequest.getProductUnit())
-                    .unitPrice(productInfo.getPrice())
+                    .totalPrice(productInfo.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQty())))
                     .build();
 
             items.add(orderDetails);

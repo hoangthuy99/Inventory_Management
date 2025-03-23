@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -53,7 +54,7 @@ public class AuthServiceIMPL implements AuthService {
         authenticationManager.authenticate(authenticationToken);
 
         // generate token
-        String token =jwtTokenUtil.generateToken(userOptional.get());
+        String token = jwtTokenUtil.generateToken(userOptional.get());
 
         return JwtResponse.builder()
                 .accessToken(token)
@@ -86,7 +87,7 @@ public class AuthServiceIMPL implements AuthService {
     }
 
     @Override
-    public JwtResponse oauthLogin(Map<String, Object> claims){
+    public JwtResponse oauthLogin(Map<String, Object> claims) {
         UserGoogle userGoogleExisted = userGoogleRepository.findByEmail(claims.get("email").toString()).orElse(null);
 
         // if not exist save to database
@@ -98,13 +99,14 @@ public class AuthServiceIMPL implements AuthService {
                     .createdAt(LocalDateTime.now())
                     .deleteFg(false)
                     .build();
-            userGoogleExisted =  userGoogleRepository.save(userGoogle);
+            userGoogleExisted = userGoogleRepository.save(userGoogle);
         }
 
         return JwtResponse.builder()
                 .email(userGoogleExisted.getEmail())
                 .username(userGoogleExisted.getUsername())
                 .fullName(userGoogleExisted.getUsername())
+                .roles(List.of("ROLE_ADMIN"))
                 .build();
     }
 }

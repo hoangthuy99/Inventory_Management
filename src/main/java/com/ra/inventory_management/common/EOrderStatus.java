@@ -1,12 +1,15 @@
 package com.ra.inventory_management.common;
 
 public enum EOrderStatus {
-    PENDING(0),
-    CONFIRMED(1),
-    SHIPPED(2),
-    COMPLETED(3),
-    CANCELED(4);
-
+    PENDING(1),
+    APPROVED(2),
+    REJECTED(3),
+    PICKING(4),
+    PACKING(5),
+    WAITDELIVERY(6),
+    HAVEDELIVERY(7),
+    CANCELED(8),
+    DONE(9);
     private final int value;
 
     EOrderStatus(int value) {
