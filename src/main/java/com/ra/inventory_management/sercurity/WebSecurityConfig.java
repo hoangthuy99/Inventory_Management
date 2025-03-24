@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -54,10 +56,10 @@ public class WebSecurityConfig {
                 cors(cors -> cors.configurationSource(corsConfiguration())).
                 authenticationProvider(authenticationProvider()).
                 authorizeHttpRequests(
-                        (auth)->auth
+                        (auth) -> auth
                                 .requestMatchers("/**").permitAll()
-//                                .requestMatchers("/categories/**").permitAll()
-//                                .requestMatchers("/products/**").permitAll()
+                                .requestMatchers("/categories/**").permitAll()
+                                .requestMatchers("/products/**").permitAll()
 //                                .requestMatchers("/admin/**").hasAuthority(String.valueOf(ERoles.ROLE_ADMIN))
 //                                .requestMatchers("/user/**").hasAuthority(String.valueOf(ERoles.ROLE_STAFF))
                                 .anyRequest().authenticated()
@@ -134,5 +136,10 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Bean
+    public JavaMailSender javaMailSender() {
+        return new JavaMailSenderImpl();
     }
 }

@@ -3,12 +3,15 @@ package com.ra.inventory_management.controller;
 import com.ra.inventory_management.model.dto.response.BaseResponse;
 import com.ra.inventory_management.model.dto.response.TotalBussinessResponse;
 import com.ra.inventory_management.model.dto.response.TotalOrderStatusResponse;
+import com.ra.inventory_management.model.dto.response.TotalRevenueResponse;
 import com.ra.inventory_management.service.StatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/statistic")
@@ -30,4 +33,10 @@ public class StatisticController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
+    @GetMapping("getTotalRevenue")
+    public ResponseEntity<?> getTotalRevenue() {
+        List<TotalRevenueResponse> response = statisticService.getTotalRevenue();
+        return ResponseEntity.ok().body(new BaseResponse<>(response));
+
+    }
 }

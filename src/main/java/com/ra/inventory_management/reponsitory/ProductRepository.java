@@ -1,6 +1,5 @@
 package com.ra.inventory_management.reponsitory;
 
-import com.ra.inventory_management.common.EOrderStatus;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.ProductInfo;
 
@@ -46,6 +45,6 @@ public interface ProductRepository extends JpaRepository<ProductInfo, Long> {
             select od.productInfo.id from OrderDetails od where od.qty > p.qty and od.order.status in (:orderStatus)
             )
             """)
-    List<Integer> getLowStockProducts(@Param("orderStatus") List<EOrderStatus> orderStatus);
+    List<Integer> getLowStockProducts(@Param("orderStatus") List<Integer> orderStatus);
 
 }

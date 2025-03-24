@@ -1,12 +1,16 @@
 package com.ra.inventory_management.model.dto.response;
 
+import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
+import java.time.LocalDate;
 
 @Data
+@Builder
 public class TotalRevenueResponse {
     private Integer filterType;
 
-    private Double total;
+    private Double totalRevenue;
+
+    private Double totalImportCost;
 }

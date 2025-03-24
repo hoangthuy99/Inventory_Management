@@ -1,6 +1,5 @@
 package com.ra.inventory_management.reponsitory;
 
-import com.ra.inventory_management.common.EOrderStatus;
 import com.ra.inventory_management.model.entity.Orders;
 import jakarta.persistence.Tuple;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,16 +31,29 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     @Query("""
                 select sum(o.totalPrice) from Orders o where o.status = :status
             """)
-    Double getTotalRevenue(@Param("status") EOrderStatus status);
+    Double getTotalRevenue(@Param("status") Integer status);
 
     @Query("""
-                select o.status as status, sum(o.id) as total from Orders o where o.status in (:orderStatus) group by o.status
+                select o.status as status, count(distinct o.id) as total from Orders o where o.status in (:orderStatus) group by o.status
             """)
-    List<Tuple> getTotalOrderStatus(@Param("orderStatus") List<EOrderStatus> orderStatus);
-
+    List<Tuple> getTotalOrderStatus(@Param("orderStatus") List<Integer> orderStatus);
 
     @Query("""
-            select o from Orders o where o.status = :status
+            select 
+            (
+                case when :filterType = 1 then month(o.actualExportDate)
+                when :filterType = 2 then quarter(o.actualExportDate) 
+                when :filterType = 3 then year(o.actualExportDate)
+                end
+            ) as filterType, 
+            cast(sum(o.totalPrice) as double ) as total 
+            from Orders o where o.status = :orderStatus
+            group by (
+                case when :filterType = 1 then month(o.actualExportDate)
+                when :filterType = 2 then quarter(o.actualExportDate) 
+                when :filterType = 3 then year(o.actualExportDate)
+                end
+            )
             """)
-    List<Tuple> getTotalRevenue(@Param("filterType") Integer filterType);
+    List<Tuple> getTotalRevenueByFilterType(@Param("filterType") Integer filterType, @Param("orderStatus") Integer orderStatus);
 }

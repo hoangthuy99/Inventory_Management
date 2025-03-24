@@ -1,16 +1,15 @@
 package com.ra.inventory_management.controller;
 
-import com.ra.inventory_management.common.EOrderStatus;
 import com.ra.inventory_management.model.dto.request.OrderRequest;
-import com.ra.inventory_management.model.entity.Customer;
+import com.ra.inventory_management.model.dto.request.PurchaseOrderRequest;
+import com.ra.inventory_management.model.dto.response.BaseResponse;
 import com.ra.inventory_management.model.entity.Orders;
-import com.ra.inventory_management.reponsitory.OrderRepository;
+import com.ra.inventory_management.model.entity.PurchaseOrder;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,12 +28,18 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAll());
     }
 
-    @PostMapping("/save")
+    @PostMapping("/createOrder")
     public ResponseEntity<Orders> saveOrder(@RequestBody OrderRequest orderRequest) {
         System.out.println("Dữ liệu nhận được: " + orderRequest);
         Orders savedOrder = orderService.save(orderRequest);
         return ResponseEntity.ok(savedOrder);
     }
+    @PutMapping("/updateOrder")
+    public ResponseEntity<?> updateOrder( @RequestBody OrderRequest request) {
+        Orders order = orderService.update(request);
+        return ResponseEntity.ok().body(new BaseResponse<>(order));
+    }
+
 
     // Lấy đơn hàng theo ID
     @GetMapping("/{id}")
@@ -49,7 +54,7 @@ public class OrderController {
     public ResponseEntity<Orders> getByIdAndStatus(
             @PathVariable Long customerId,
             @PathVariable Long orderId,
-            @PathVariable EOrderStatus status) {
+            @PathVariable int status) {
         Orders order = orderService.getByIdAndStatus(customerId, orderId, status);
         return ResponseEntity.ok(order);
     }
