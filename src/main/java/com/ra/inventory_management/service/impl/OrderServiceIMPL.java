@@ -1,5 +1,6 @@
 package com.ra.inventory_management.service.impl;
 
+import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.dto.request.OrderDetailRequest;
 import com.ra.inventory_management.model.dto.request.OrderRequest;
 import com.ra.inventory_management.model.entity.*;
@@ -7,7 +8,10 @@ import com.ra.inventory_management.reponsitory.*;
 import com.ra.inventory_management.service.AuthService;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -175,6 +179,59 @@ public class OrderServiceIMPL implements OrderService {
         }
         return orderRepository.save(order);
     }
+
+    @Transactional
+    @Override
+    public Orders updateOrderStatus(Long orderId, Integer newStatus) {
+        Orders orders = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn đặt hàng"));
+
+        Integer currentStatus = orders.getStatus();
+
+        // Kiểm tra trạng thái có hợp lệ không
+        if (!isValidTransition(currentStatus, newStatus)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không thể chuyển trạng thái trực tiếp");
+        }
+
+        // Trừ số lượng khi đóng gói hoặc khi đã giao hàng
+        if (newStatus.equals(Constant.ISSUE_PACKING) || newStatus.equals(Constant.ISSUE_SHIPPED) || newStatus.equals(Constant.ISSUE_CONFIRMED)) {
+            deductProductQuantity(orders);
+        }
+
+        // Cộng lại số lượng khi bị hủy
+        if (newStatus.equals(Constant.ISSUE_CANCELED)) {
+            restoreProductQuantity(orders);
+        }
+
+        // Cập nhật trạng thái đơn hàng
+        orders.setStatus(newStatus);
+        return orderRepository.save(orders);
+    }
+
+    private boolean isValidTransition(Integer current, Integer next) {
+        return (current + 1 == next) || (next.equals(Constant.ISSUE_CANCELED)); // Chỉ đi từng bước hoặc hủy đơn
+    }
+    @Transactional
+    protected void deductProductQuantity(Orders orders) {
+        for (OrderDetails item : orders.getOrderDetails()) {
+            ProductInfo product = item.getProductInfo();
+            if (product.getQty() < item.getQty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không đủ số lượng sản phẩm trong kho");
+            }
+            product.setQty(product.getQty() - item.getQty());
+            productRepository.save(product);
+        }
+    }
+
+    private void restoreProductQuantity(Orders orders) {
+        for (OrderDetails item : orders.getOrderDetails()) {
+            ProductInfo product = item.getProductInfo();
+            product.setQty(product.getQty() + item.getQty());
+            productRepository.save(product);
+        }
+    }
+
+
 
     @Override
     public Optional<Orders> findById(Long id) {

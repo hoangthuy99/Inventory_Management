@@ -1,5 +1,6 @@
 package com.ra.inventory_management.sercurity;
 
+import com.ra.inventory_management.common.ERoles;
 import com.ra.inventory_management.filter.JwtTokenFilter;
 import com.ra.inventory_management.reponsitory.UserRepository;
 import com.ra.inventory_management.sercurity.UserDetail.UserDetailService;
@@ -54,13 +55,13 @@ public class WebSecurityConfig {
                 cors(cors -> cors.configurationSource(corsConfiguration())).
                 authenticationProvider(authenticationProvider()).
                 authorizeHttpRequests(
-                        (auth)->auth
-                                .requestMatchers("/**").permitAll()
-                                .requestMatchers("/categories/**").permitAll()
-                                .requestMatchers("/products/**").permitAll()
-//                                .requestMatchers("/admin/**").hasAuthority(String.valueOf(ERoles.ROLE_ADMIN))
-//                                .requestMatchers("/user/**").hasAuthority(String.valueOf(ERoles.ROLE_STAFF))
+                        (auth) -> auth
+                                .requestMatchers("/auth/**").permitAll()  // Cho phép đăng ký, đăng nhập
+                                .requestMatchers("/categories/**", "/products/**").permitAll()
+                                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                                .requestMatchers("/user/**").hasAuthority("ROLE_STAFF")
                                 .anyRequest().authenticated()
+
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt())
                 .logout(logout -> logout
