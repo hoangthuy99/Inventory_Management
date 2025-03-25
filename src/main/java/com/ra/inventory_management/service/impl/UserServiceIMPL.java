@@ -8,6 +8,7 @@ import com.ra.inventory_management.model.entity.Users;
 
 import com.ra.inventory_management.reponsitory.RoleRepository;
 import com.ra.inventory_management.reponsitory.UserRepository;
+import com.ra.inventory_management.service.EmailService;
 import com.ra.inventory_management.service.RoleService;
 import com.ra.inventory_management.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -37,6 +35,8 @@ public class UserServiceIMPL implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private EmailService emailService;
 
 
     @Override
@@ -55,20 +55,33 @@ public class UserServiceIMPL implements UserService {
         user.setFullName(registerRequest.getFullName());
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
-        user.setPassword(registerRequest.getPassword());
 
+        //  Mã hóa mật khẩu trước khi lưu
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+
+        //  Gán quyền mặc định
         Set<Roles> defaultRoles = new HashSet<>();
         defaultRoles.add(roleRepository.findByRoleName(ERoles.ROLE_STAFF));
         user.setRoles(defaultRoles);
 
-        try {
-            return userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            logger.error("Error saving user: " + e.getRootCause().getMessage());
-            throw new IllegalArgumentException("An error occurred while saving the user: " + e.getRootCause().getMessage());
-        }
+        //  Tạo mã xác nhận
+        String verificationCode = UUID.randomUUID().toString();
+        user.setUserCode(verificationCode); // Tạm dùng field avatar để lưu mã xác nhận
+        user.setActiveFlag(0); // 0: chưa xác nhận
 
+        try {
+            userRepository.save(user);
+
+            //  Gửi email xác nhận
+            emailService.sendVerificationEmail(user.getEmail(), verificationCode);
+
+            return user;
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Lỗi khi lưu user: " + e.getRootCause().getMessage());
+            throw new IllegalArgumentException("Lỗi khi lưu user: " + e.getRootCause().getMessage());
+        }
     }
+
     @Override
     public Page<Users> getAll(Pageable pageable) {
         return userRepository.findAll(pageable);
@@ -102,12 +115,12 @@ public class UserServiceIMPL implements UserService {
 
         Users users = Users.builder()
                 .id(user.getId())
+                .userCode(user.getUserCode())
                 .username(user.getUsername())
                 .fullName(userOld.getFullName())
                 .email(user.getEmail())
                 .address(user.getAddress())
                 .phone(user.getPhone())
-                .avatar(user.getAvatar())
                 .activeFlag(user.getActiveFlag())
                 .createdDate(user.getCreatedDate())
                 .updateDate(user.getUpdateDate())
