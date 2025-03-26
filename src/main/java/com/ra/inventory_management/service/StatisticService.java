@@ -7,10 +7,13 @@ import com.ra.inventory_management.model.dto.response.TotalRevenueResponse;
 import com.ra.inventory_management.reponsitory.BranchRepository;
 import com.ra.inventory_management.reponsitory.OrderRepository;
 import com.ra.inventory_management.reponsitory.ProductRepository;
+import com.ra.inventory_management.reponsitory.PurchaseOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +28,9 @@ public class StatisticService {
 
     @Autowired
     private BranchRepository branchRepository;
+
+    @Autowired
+    private PurchaseOrderRepository purchaseOrderRepository;
 
     public TotalBussinessResponse getTotalBussiness() {
         TotalBussinessResponse response = new TotalBussinessResponse();
@@ -66,14 +72,55 @@ public class StatisticService {
         return response;
     }
 
-    public List<TotalRevenueResponse> getTotalRevenue() {
+    public List<TotalRevenueResponse> getTotalRevenue(Integer filterType) {
         // Get total order done
-        List<TotalRevenueResponse> totalData = orderRepository.getTotalRevenueByFilterType(Constant.BY_YEAR, Constant.GDI_DONE)
+        Map<Integer, Double> revenueData = orderRepository.getTotalRevenueByFilterType(filterType, Constant.GDI_DONE)
                 .stream()
-                .map(obj -> TotalRevenueResponse.builder().filterType(obj.get("filterType", Integer.class))
-                        .totalRevenue(obj.get("total", Double.class).doubleValue()).build()).toList();
+                .collect(Collectors.toMap(
+                        obj -> obj.get("filterType", Integer.class),
+                        obj -> obj.get("totalRevenue", Double.class).doubleValue()
+                ));
 
+        // get total import cost by status done
+        Map<Integer, Double> importCostData = purchaseOrderRepository.getTotalPurchaseByFilterType(filterType, Constant.GDR_DONE)
+                .stream()
+                .collect(Collectors.toMap(
+                        obj -> obj.get("filterType", Integer.class),
+                        obj -> obj.get("totalCost", Double.class).doubleValue()
+                ));
 
-        return totalData;
+        // Use Map type to group data by filter type
+        Map<Integer, TotalRevenueResponse> combinedData = new HashMap<>();
+
+        // Combine revenue data
+        for (Map.Entry<Integer, Double> entry : revenueData.entrySet()) {
+            combinedData.putIfAbsent(entry.getKey(), TotalRevenueResponse.builder().filterType(entry.getKey()).totalRevenue(entry.getValue()).build());
+            combinedData.get(entry.getKey()).setTotalRevenue(entry.getValue());
+        }
+
+        // Combine import cost
+        for (Map.Entry<Integer, Double> entry : importCostData.entrySet()) {
+            combinedData.putIfAbsent(entry.getKey(), TotalRevenueResponse.builder().filterType(entry.getKey()).totalImportCost(entry.getValue()).build());
+            combinedData.get(entry.getKey()).setTotalImportCost(entry.getValue());
+        }
+
+        // Change map to list
+        List<TotalRevenueResponse> responses = new ArrayList<>(combinedData.values());
+
+        // If filter type is month change integer to string
+        if (filterType.equals(Constant.BY_MONTH)) {
+            responses = responses.stream()
+                    .map((obj -> {
+                        String filter = LocalDate.of(1900, (Integer) obj.getFilterType(), 1).getMonth().toString().toLowerCase();
+
+                        return TotalRevenueResponse.builder()
+                                .filterType(filter)
+                                .totalRevenue(obj.getTotalRevenue())
+                                .totalImportCost(obj.getTotalImportCost())
+                                .build();
+                    })).toList();
+        }
+
+        return responses;
     }
 }

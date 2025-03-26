@@ -15,11 +15,11 @@ public class Constant {
     public static final Integer STOCK_REPAIR = 2;
 
     // Good Receipt Status
-    public static final Integer PENDING = 1;
-    public static final Integer APPROVED = 2;
-    public static final Integer REJECTED = 3;
-    public static final Integer CANCELED = 4;
-    public static final Integer DONE = 5;
+    public static final Integer GDR_PENDING = 1;
+    public static final Integer GDR_APPROVED = 2;
+    public static final Integer GDR_REJECTED = 3;
+    public static final Integer GDR_CANCELED = 4;
+    public static final Integer GDR_DONE = 5;
 
     // Good Issue Status
     public static final Integer ISSUE_PENDING = 1; // Chờ duyệt

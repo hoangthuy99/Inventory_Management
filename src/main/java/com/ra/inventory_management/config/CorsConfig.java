@@ -12,16 +12,28 @@ public class CorsConfig {
     @Value("${path-upload}")
     private String uploadDir;
 
+    @Value("${cors.allowed-origins}")
+    private String[] allowedOrigins;
+
+    @Value("${cors.allowed-methods}")
+    private String[] allowedMethods;
+
+    @Value("${cors.allowed-headers}")
+    private String allowedHeaders;
+
+    @Value("${cors.allow-credentials}")
+    private boolean allowCredentials;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // Hoặc "*" nếu test
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedOrigins(allowedOrigins) // Hoặc "*" nếu test
+                        .allowedMethods(allowedMethods)
+                        .allowedHeaders(allowedHeaders)
+                        .allowCredentials(allowCredentials);
             }
 
             @Override

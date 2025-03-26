@@ -59,7 +59,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
                 .supplier(supplier)
                 .createdAt(LocalDateTime.now())
                 .note(request.getNote())
-                .status(Constant.PENDING)
+                .status(Constant.GDR_PENDING)
                 .branch(branch)
                 .deleteFg(false)
                 .code(String.format("PCO%s", LocalDateTime.now().format(formatter)))
@@ -187,7 +187,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
         PurchaseOrder response = purchaseOrderRepository.save(order);
 
         // If status ís done plus stock of product
-        if (request.getId() != null && request.getStatus().equals(Constant.DONE)) {
+        if (request.getId() != null && request.getStatus().equals(Constant.GDR_DONE)) {
             for (PurchaseOrderItemRequest itemRequest : request.getItems()) {
                 ProductInfo productInfo = productRepository.findById(itemRequest.getProductId()).orElse(null);
 
@@ -200,7 +200,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
         }
 
         // If status is cancel subtract stock of product
-        if (request.getId() != null && request.getStatus().equals(Constant.CANCELED)) {
+        if (request.getId() != null && request.getStatus().equals(Constant.GDR_CANCELED)) {
             for (PurchaseOrderItemRequest itemRequest : request.getItems()) {
                 ProductInfo productInfo = productRepository.findById(itemRequest.getProductId()).orElse(null);
 

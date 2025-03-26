@@ -8,10 +8,12 @@ import com.ra.inventory_management.service.StatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app/statistic")
@@ -33,9 +35,9 @@ public class StatisticController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
-    @GetMapping("getTotalRevenue")
-    public ResponseEntity<?> getTotalRevenue() {
-        List<TotalRevenueResponse> response = statisticService.getTotalRevenue();
+    @GetMapping("getTotalRevenue/{filterType}")
+    public ResponseEntity<?> getTotalRevenue(@PathVariable Integer filterType) {
+        List<TotalRevenueResponse> response = statisticService.getTotalRevenue(filterType);
         return ResponseEntity.ok().body(new BaseResponse<>(response));
 
     }

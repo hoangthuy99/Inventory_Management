@@ -46,7 +46,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
                 when :filterType = 3 then year(o.actualExportDate)
                 end
             ) as filterType, 
-            cast(sum(o.totalPrice) as double ) as total 
+            cast(sum(o.totalPrice) as double ) as totalRevenue 
             from Orders o where o.status = :orderStatus
             group by (
                 case when :filterType = 1 then month(o.actualExportDate)
