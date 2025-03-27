@@ -26,7 +26,6 @@ public class EmailService {
         simpleMailMessage.setText("Cảm ơn " + userDTO.getUserName() + " đã đăng ký tài khoản thành công");
         simpleMailMessage.setSubject("Thư cảm ơn");
         javaMailSender.send(simpleMailMessage);
-
     }
 
     public void sendVerificationEmail(String email, String verificationCode) {

@@ -101,7 +101,7 @@ public class Users implements UserDetails {
         return true;
 
     }
-
+  
     public static String generateUserCode() {
         return "US" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 5).toUpperCase();
     }
