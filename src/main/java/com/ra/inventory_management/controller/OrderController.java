@@ -7,10 +7,14 @@ import com.ra.inventory_management.model.entity.Orders;
 import com.ra.inventory_management.model.entity.PurchaseOrder;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -57,6 +61,22 @@ public class OrderController {
             @PathVariable int status) {
         Orders order = orderService.getByIdAndStatus(customerId, orderId, status);
         return ResponseEntity.ok(order);
+    }
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, Integer> requestBody) {
+        try {
+            Integer newStatus = requestBody.get("newStatus");
+            if (newStatus == null) {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Thiếu trạng thái mới"));
+            }
+
+            Orders updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
+            return ResponseEntity.ok(updatedOrder);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(Collections.singletonMap("error", e.getReason()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Lỗi hệ thống"));
+        }
     }
 
     // Tìm đơn hàng theo mã đơn hàng

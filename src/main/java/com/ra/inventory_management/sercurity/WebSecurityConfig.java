@@ -1,5 +1,6 @@
 package com.ra.inventory_management.sercurity;
 
+import com.ra.inventory_management.common.ERoles;
 import com.ra.inventory_management.filter.JwtTokenFilter;
 import com.ra.inventory_management.reponsitory.UserRepository;
 import com.ra.inventory_management.sercurity.UserDetail.UserDetailService;
@@ -7,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -49,6 +48,13 @@ public class WebSecurityConfig {
     @Lazy
     private JwtTokenFilter jwtTokenFilter;
 
+    private final List<String> permitEndpoints = List.of(
+            "/app/auth/**",
+            "/app/category/**",
+            "/app/product/**",
+            "/uploads/**"
+    );
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.
@@ -57,12 +63,12 @@ public class WebSecurityConfig {
                 authenticationProvider(authenticationProvider()).
                 authorizeHttpRequests(
                         (auth) -> auth
-                                .requestMatchers("/**").permitAll()
-                                .requestMatchers("/categories/**").permitAll()
-                                .requestMatchers("/products/**").permitAll()
-//                                .requestMatchers("/admin/**").hasAuthority(String.valueOf(ERoles.ROLE_ADMIN))
-//                                .requestMatchers("/user/**").hasAuthority(String.valueOf(ERoles.ROLE_STAFF))
+                                .requestMatchers("/app/auth/**",
+                                        "/app/category/**",
+                                        "/app/product/**",
+                                        "/uploads/**").permitAll()
                                 .anyRequest().authenticated()
+
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt())
                 .logout(logout -> logout
@@ -136,10 +142,5 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
-    }
-
-    @Bean
-    public JavaMailSender javaMailSender() {
-        return new JavaMailSenderImpl();
     }
 }

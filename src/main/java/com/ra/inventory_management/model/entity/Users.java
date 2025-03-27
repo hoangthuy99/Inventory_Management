@@ -6,13 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +23,9 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "user_code", length = 10, unique = true, nullable = false)
+    private String userCode;
 
     @Column(name = "user_name", unique = true, length = 100, nullable = false)
     private String username;
@@ -44,8 +45,6 @@ public class Users implements UserDetails {
     @Column(name = "address", nullable = false, length = 200)
     private String address;
 
-    @Column(name = "avatar", nullable = false, length = 200)
-    private String avatar;
 
     @Column(name = "active_flag", nullable = false)
     private Integer activeFlag;
@@ -77,7 +76,8 @@ public class Users implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return roles.stream()
+                .map(r -> new SimpleGrantedAuthority(r.getRoleName().name())).toList();
     }
 
     @Override
@@ -101,4 +101,10 @@ public class Users implements UserDetails {
         return true;
 
     }
+
+    public static String generateUserCode() {
+        return "US" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 5).toUpperCase();
+    }
+
+
 }

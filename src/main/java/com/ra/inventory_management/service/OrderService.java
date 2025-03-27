@@ -14,7 +14,7 @@ public interface OrderService {
     Orders save(OrderRequest orderRequest);
 
     Orders update(OrderRequest orderRequest);
-
+    Orders updateOrderStatus(Long orderId, Integer newStatus);
 
     Optional<Orders> findById(Long id);
 

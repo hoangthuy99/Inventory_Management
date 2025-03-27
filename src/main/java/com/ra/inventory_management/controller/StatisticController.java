@@ -7,6 +7,7 @@ import com.ra.inventory_management.model.dto.response.TotalRevenueResponse;
 import com.ra.inventory_management.service.StatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class StatisticController {
     @Autowired
     private StatisticService statisticService;
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @GetMapping("getTotalBussiness")
     public ResponseEntity<?> getTotalBussiness() {
         TotalBussinessResponse response = statisticService.getTotalBussiness();
