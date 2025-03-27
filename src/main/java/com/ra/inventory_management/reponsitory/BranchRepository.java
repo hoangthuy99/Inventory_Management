@@ -9,4 +9,9 @@ import java.util.List;
 public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query("SELECT b from Branch b WHERE b.name like ?1% ")
     List<Branch> searchByName(String keyword);
+
+    @Query("""
+                select count(b.id) from Branch b
+            """)
+    Integer getTotalBranchs();
 }

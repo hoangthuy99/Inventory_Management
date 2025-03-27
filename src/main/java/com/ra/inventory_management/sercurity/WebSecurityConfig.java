@@ -48,6 +48,13 @@ public class WebSecurityConfig {
     @Lazy
     private JwtTokenFilter jwtTokenFilter;
 
+    private final List<String> permitEndpoints = List.of(
+            "/app/auth/**",
+            "/app/category/**",
+            "/app/product/**",
+            "/uploads/**"
+    );
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.
@@ -56,10 +63,10 @@ public class WebSecurityConfig {
                 authenticationProvider(authenticationProvider()).
                 authorizeHttpRequests(
                         (auth) -> auth
-                                .requestMatchers("/auth/**").permitAll()  // Cho phép đăng ký, đăng nhập
-                                .requestMatchers("/categories/**", "/products/**").permitAll()
-                                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                                .requestMatchers("/user/**").hasAuthority("ROLE_STAFF")
+                                .requestMatchers("/app/auth/**",
+                                        "/app/category/**",
+                                        "/app/product/**",
+                                        "/uploads/**").permitAll()
                                 .anyRequest().authenticated()
 
                 )

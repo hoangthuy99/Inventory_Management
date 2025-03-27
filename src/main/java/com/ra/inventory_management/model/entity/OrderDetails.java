@@ -35,7 +35,7 @@ public class OrderDetails {
     private Integer productUnit;
 
     @Column(name = "total_price", nullable = false)
-    private BigDecimal unitPrice;
+    private BigDecimal totalPrice;
     @NotNull
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

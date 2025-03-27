@@ -14,18 +14,18 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
-    @KafkaListener(id="email", topics = "spring-boot-topic")
-    @Async
 
-    public void sendEmail(UserDTO userDTO){
+//    @KafkaListener(id = "email", topics = "spring-boot-topic")
+//    @Async
+
+    public void sendEmail(UserDTO userDTO) {
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom("hithuy98@gmail.com");
         simpleMailMessage.setTo(userDTO.getEmail());
-        simpleMailMessage.setText("Cảm ơn "+userDTO.getUserName()+" đã đăng ký tài khoản thành công");
+        simpleMailMessage.setText("Cảm ơn " + userDTO.getUserName() + " đã đăng ký tài khoản thành công");
         simpleMailMessage.setSubject("Thư cảm ơn");
         javaMailSender.send(simpleMailMessage);
-
     }
 
     public void sendVerificationEmail(String email, String verificationCode) {

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -90,7 +91,7 @@ public class OrderServiceIMPL implements OrderService {
                     .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0)  // Kiểm tra NULL
                     .productInfo(productInfo)
                     .productUnit(itemRequest.getProductUnit())
-                    .unitPrice(productInfo.getPrice())
+                    .totalPrice(productInfo.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQty())))
                     .build();
 
             items.add(orderDetails);
@@ -141,7 +142,7 @@ public class OrderServiceIMPL implements OrderService {
         if (orderRequest.getStatus() != null) {
             order.setStatus(orderRequest.getStatus());
         }
-        if(orderRequest.getTotalPrice() !=null){
+        if (orderRequest.getTotalPrice() != null) {
             order.setTotalPrice(orderRequest.getTotalPrice());
         }
 
@@ -153,15 +154,15 @@ public class OrderServiceIMPL implements OrderService {
                 ProductInfo productInfo = productRepository.findById(itemRequest.getProductId())
                         .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với id: " + itemRequest.getProductId()));
                 Optional<OrderDetails> existingOrderDetail = order.getOrderDetails().stream()
-                        .filter(od ->od.getId().equals(itemRequest.getId()) )
+                        .filter(od -> od.getId().equals(itemRequest.getId()))
                         .findFirst();
 
                 if (existingOrderDetail.isPresent()) {
                     OrderDetails orderDetails = existingOrderDetail.get();
                     orderDetails.setQty(itemRequest.getQty() != null ? itemRequest.getQty() : 0);
                     orderDetails.setProductUnit(itemRequest.getProductUnit());
-                    orderDetails.setUnitPrice(productInfo.getPrice());
                     orderDetails.setDeleteFg(itemRequest.getDeleteFg());
+                    orderDetails.setProductUnit(itemRequest.getProductUnit());
                     updatedItems.add(orderDetails);
                 } else {
                     OrderDetails newOrderDetails = OrderDetails.builder()
@@ -170,12 +171,12 @@ public class OrderServiceIMPL implements OrderService {
                             .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0)
                             .productInfo(productInfo)
                             .productUnit(itemRequest.getProductUnit())
-                            .unitPrice(productInfo.getPrice())
+                            .totalPrice(productInfo.getPrice())
                             .build();
                     updatedItems.add(newOrderDetails);
                 }
             }
-           order.setOrderDetails(updatedItems);
+            order.setOrderDetails(updatedItems);
         }
         return orderRepository.save(order);
     }

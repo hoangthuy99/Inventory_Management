@@ -9,7 +9,6 @@ import org.springframework.kafka.support.converter.JsonMessageConverter;
 @SpringBootApplication
 
 public class InventoryManagementApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(InventoryManagementApplication.class, args);
 	}
@@ -17,5 +16,4 @@ public class InventoryManagementApplication {
 	JsonMessageConverter messageConverter(){
 		return new JsonMessageConverter();
 	}
-
 }

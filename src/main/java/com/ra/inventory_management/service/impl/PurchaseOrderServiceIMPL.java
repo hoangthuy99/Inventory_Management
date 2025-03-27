@@ -14,10 +14,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -57,7 +59,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
                 .supplier(supplier)
                 .createdAt(LocalDateTime.now())
                 .note(request.getNote())
-                .status(Constant.PENDING)
+                .status(Constant.GDR_PENDING)
                 .branch(branch)
                 .deleteFg(false)
                 .code(String.format("PCO%s", LocalDateTime.now().format(formatter)))
@@ -91,6 +93,9 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
 
         // Assign item líst for purchase order
         purchaseOrder.setPurchaseOrderItems(items);
+        purchaseOrder.setTotalAmount(items.stream()
+                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantityPlan())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
 
         // Save purchase order
         PurchaseOrder response = purchaseOrderRepository.save(purchaseOrder);
@@ -174,9 +179,38 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
 
         // Assign item líst for purchase order
         order.setPurchaseOrderItems(items);
+        order.setTotalAmount(items.stream()
+                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantityPlan())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
 
         // Save purchase order
         PurchaseOrder response = purchaseOrderRepository.save(order);
+
+        // If status ís done plus stock of product
+        if (request.getId() != null && request.getStatus().equals(Constant.GDR_DONE)) {
+            for (PurchaseOrderItemRequest itemRequest : request.getItems()) {
+                ProductInfo productInfo = productRepository.findById(itemRequest.getProductId()).orElse(null);
+
+                if (productInfo != null) {
+                    Integer quantityUpdated = itemRequest.getQuantityActual() + productInfo.getQty();
+                    productInfo.setQty(quantityUpdated);
+                    productRepository.save(productInfo);
+                }
+            }
+        }
+
+        // If status is cancel subtract stock of product
+        if (request.getId() != null && request.getStatus().equals(Constant.GDR_CANCELED)) {
+            for (PurchaseOrderItemRequest itemRequest : request.getItems()) {
+                ProductInfo productInfo = productRepository.findById(itemRequest.getProductId()).orElse(null);
+
+                if (productInfo != null) {
+                    Integer quantityUpdated = productInfo.getQty() - itemRequest.getQuantityActual();
+                    productInfo.setQty(quantityUpdated);
+                    productRepository.save(productInfo);
+                }
+            }
+        }
 
         log.info("end: updatePurchaseOrder");
         return response;

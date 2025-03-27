@@ -86,7 +86,7 @@ public class Orders {
     public void calculateTotalPrice() {
         if (orderDetails != null && !orderDetails.isEmpty()) {
             this.totalPrice = orderDetails.stream()
-                    .map(orderDetail -> orderDetail.getUnitPrice().multiply(BigDecimal.valueOf(orderDetail.getProductInfo().getQty())))
+                    .map(OrderDetails::getTotalPrice)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
         } else {
             this.totalPrice = BigDecimal.ZERO;
