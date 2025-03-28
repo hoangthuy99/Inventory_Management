@@ -30,7 +30,7 @@ public class Branch {
     @Column(name = "phone", nullable = false, length = 15, unique = true)
     private String phone;
 
-    @Column(name = "map_image", nullable = false, length = 15, unique = true)
+    @Column(name = "map_image", nullable = false, length = 255, unique = true)
     private String mapImage;
 
     @Column(name = "active_flag", nullable = false)
