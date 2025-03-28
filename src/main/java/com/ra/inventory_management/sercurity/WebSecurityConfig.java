@@ -69,7 +69,7 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
 
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt())
+                // .oauth2ResourceServer(oauth2 -> oauth2.jwt())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
