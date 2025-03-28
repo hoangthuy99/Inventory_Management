@@ -61,13 +61,12 @@ public class WebSecurityConfig {
                 csrf(AbstractHttpConfigurer::disable).
                 cors(cors -> cors.configurationSource(corsConfiguration())).
                 authenticationProvider(authenticationProvider()).
-                authorizeHttpRequests(
-                        (auth) -> auth
-                                .requestMatchers("/app/auth/**",
-                                        "/app/category/**",
-                                        "/app/product/**",
-                                        "/uploads/**").permitAll()
-                                .anyRequest().authenticated()
+                authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/app/auth/**",
+                                "/app/category/**",
+                                "/app/product/**",
+                                "/uploads/**").permitAll()
+                        .anyRequest().authenticated()
 
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt())

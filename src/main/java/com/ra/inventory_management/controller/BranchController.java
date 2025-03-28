@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,17 +34,20 @@ public class BranchController {
     @Autowired
     private BranchService branchService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<Branch>> getAllBranches() {
         return ResponseEntity.ok(branchService.getAll());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Branch> getBranchById(@PathVariable Long id) {
         Optional<Branch> branch = branchService.findById(id);
         return branch.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createBranch(@ModelAttribute Branch branch,
                                           @RequestParam(value = "img", required = false) MultipartFile image
@@ -76,6 +80,7 @@ public class BranchController {
         return ResponseEntity.ok(branchService.save(branch));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Branch> updateBranch(@PathVariable Long id, @RequestBody Branch branchDetails) {
         Optional<Branch> existingBranch = branchService.findById(id);
@@ -86,18 +91,21 @@ public class BranchController {
         return ResponseEntity.notFound().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBranch(@PathVariable Long id) {
         branchService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/search")
     public ResponseEntity<List<Branch>> searchBranches(@RequestParam String keyword) {
         return ResponseEntity.ok(branchService.searchByName(keyword));
     }
 
     // API import file excel
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> importExcel(
             @RequestParam("file") MultipartFile file
@@ -107,6 +115,7 @@ public class BranchController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("sampleExcel")
     public ResponseEntity<?> getSampleExcel() throws IOException {
         Map<String, String> response = branchService.getSampleExcel();

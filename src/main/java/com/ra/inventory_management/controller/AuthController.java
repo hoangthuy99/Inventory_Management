@@ -36,14 +36,16 @@ public class AuthController {
     private final AuthService authService;
 
     private final UserRepository userRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         JwtResponse response = authService.login(request.getUsername(), request.getPassword());
-        return  ResponseEntity.ok(new BaseResponse<>(response));
+        return ResponseEntity.ok(new BaseResponse<>(response));
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {

@@ -3,6 +3,7 @@ package com.ra.inventory_management.service.impl;
 import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.dto.request.OrderDetailRequest;
 import com.ra.inventory_management.model.dto.request.OrderRequest;
+import com.ra.inventory_management.model.dto.request.PurchaseOrderItemRequest;
 import com.ra.inventory_management.model.entity.*;
 import com.ra.inventory_management.reponsitory.*;
 import com.ra.inventory_management.service.AuthService;
@@ -178,6 +179,42 @@ public class OrderServiceIMPL implements OrderService {
             }
             order.setOrderDetails(updatedItems);
         }
+
+        // If status ís approved plus stock of product
+        if (orderRequest.getStatus().equals(Constant.GDI_APPROVED)) {
+            for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
+                ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
+                OrderDetails orderDetailExist = orderDetailRepository.findById(items.getId()).orElse(new OrderDetails());
+
+                if (productInfo != null) {
+                    Integer quantityUpdated = productInfo.getQty() - items.getQty();
+
+                    if (items.getQty() > orderDetailExist.getQty()) {
+                        quantityUpdated = productInfo.getQty() - (items.getQty() - orderDetailExist.getQty());
+                    } else if (items.getQty() < orderDetailExist.getQty()) {
+                        quantityUpdated = productInfo.getQty() + (orderDetailExist.getQty() - items.getQty());
+                    }
+
+                    productInfo.setQty(quantityUpdated);
+                    productRepository.save(productInfo);
+                }
+            }
+        }
+
+        // If status is cancel plus stock of product
+        if (orderRequest.getStatus().equals(Constant.GDI_CANCELED)) {
+            for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
+                ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
+
+                if (productInfo != null) {
+                    Integer quantityUpdated = productInfo.getQty() + items.getQty();
+
+                    productInfo.setQty(quantityUpdated);
+                    productRepository.save(productInfo);
+                }
+            }
+        }
+
         return orderRepository.save(order);
     }
 
@@ -212,6 +249,7 @@ public class OrderServiceIMPL implements OrderService {
     private boolean isValidTransition(Integer current, Integer next) {
         return (current + 1 == next) || (next.equals(Constant.ISSUE_CANCELED)); // Chỉ đi từng bước hoặc hủy đơn
     }
+
     @Transactional
     protected void deductProductQuantity(Orders orders) {
         for (OrderDetails item : orders.getOrderDetails()) {
@@ -231,7 +269,6 @@ public class OrderServiceIMPL implements OrderService {
             productRepository.save(product);
         }
     }
-
 
 
     @Override
