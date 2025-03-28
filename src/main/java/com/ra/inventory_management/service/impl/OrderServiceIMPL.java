@@ -35,7 +35,6 @@ public class OrderServiceIMPL implements OrderService {
         this.authService = authService;
     }
 
-
     @Override
     public List<Orders> getAllByCus(Long customId) {
         return orderRepository.findAllByCustomerId(customId);
@@ -83,12 +82,13 @@ public class OrderServiceIMPL implements OrderService {
         List<OrderDetails> items = new ArrayList<>();
         for (OrderDetailRequest itemRequest : request.getOrderDetailsRequest()) {
             ProductInfo productInfo = productRepository.findById(itemRequest.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với id: " + itemRequest.getProductId()));
+                    .orElseThrow(
+                            () -> new RuntimeException("Sản phẩm không tồn tại với id: " + itemRequest.getProductId()));
 
             OrderDetails orderDetails = OrderDetails.builder()
                     .order(order)
                     .createdAt(LocalDateTime.now())
-                    .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0)  // Kiểm tra NULL
+                    .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0) // Kiểm tra NULL
                     .productInfo(productInfo)
                     .productUnit(itemRequest.getProductUnit())
                     .totalPrice(productInfo.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQty())))
@@ -146,16 +146,46 @@ public class OrderServiceIMPL implements OrderService {
             order.setTotalPrice(orderRequest.getTotalPrice());
         }
 
-
         if (orderRequest.getOrderDetailsRequest() != null) {
             List<OrderDetails> updatedItems = new ArrayList<>();
 
             for (OrderDetailRequest itemRequest : orderRequest.getOrderDetailsRequest()) {
                 ProductInfo productInfo = productRepository.findById(itemRequest.getProductId())
-                        .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với id: " + itemRequest.getProductId()));
+                        .orElseThrow(() -> new RuntimeException(
+                                "Sản phẩm không tồn tại với id: " + itemRequest.getProductId()));
                 Optional<OrderDetails> existingOrderDetail = order.getOrderDetails().stream()
                         .filter(od -> od.getId().equals(itemRequest.getId()))
                         .findFirst();
+
+                // If status ís approved plus stock of product
+                if (orderRequest.getStatus().equals(Constant.GDI_APPROVED)) {
+                    OrderDetails orderDetails = existingOrderDetail.get();
+
+                    if (productInfo != null) {
+                        Integer quantityUpdated = productInfo.getQty() - itemRequest.getQty();
+
+                        if (itemRequest.getQty() > orderDetails.getQty()) {
+                            quantityUpdated = productInfo.getQty()
+                                    - (itemRequest.getQty() - orderDetails.getQty());
+                        } else if (itemRequest.getQty() < orderDetails.getQty()) {
+                            quantityUpdated = productInfo.getQty()
+                                    + (orderDetails.getQty() - itemRequest.getQty());
+                        }
+
+                        productInfo.setQty(quantityUpdated);
+                        productRepository.save(productInfo);
+                    }
+                }
+
+                // If status is cancel plus stock of product
+                if (orderRequest.getStatus().equals(Constant.GDI_CANCELED)) {
+                    if (productInfo != null) {
+                        Integer quantityUpdated = productInfo.getQty() + itemRequest.getQty();
+
+                        productInfo.setQty(quantityUpdated);
+                        productRepository.save(productInfo);
+                    }
+                }
 
                 if (existingOrderDetail.isPresent()) {
                     OrderDetails orderDetails = existingOrderDetail.get();
@@ -178,6 +208,43 @@ public class OrderServiceIMPL implements OrderService {
             }
             order.setOrderDetails(updatedItems);
         }
+
+        // If status ís approved plus stock of product
+        // if (orderRequest.getStatus().equals(Constant.GDI_APPROVED)) {
+        //     for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
+        //         ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
+        //         OrderDetails orderDetailExist = orderDetailRepository.findById(items.getId())
+        //                 .orElse(new OrderDetails());
+
+        //         if (productInfo != null) {
+        //             Integer quantityUpdated = productInfo.getQty() - items.getQty();
+
+        //             if (items.getQty() > orderDetailExist.getQty()) {
+        //                 quantityUpdated = productInfo.getQty() - (items.getQty() - orderDetailExist.getQty());
+        //             } else if (items.getQty() < orderDetailExist.getQty()) {
+        //                 quantityUpdated = productInfo.getQty() + (orderDetailExist.getQty() - items.getQty());
+        //             }
+
+        //             productInfo.setQty(quantityUpdated);
+        //             productRepository.save(productInfo);
+        //         }
+        //     }
+        // }
+
+        // // If status is cancel plus stock of product
+        // if (orderRequest.getStatus().equals(Constant.GDI_CANCELED)) {
+        //     for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
+        //         ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
+
+        //         if (productInfo != null) {
+        //             Integer quantityUpdated = productInfo.getQty() + items.getQty();
+
+        //             productInfo.setQty(quantityUpdated);
+        //             productRepository.save(productInfo);
+        //         }
+        //     }
+        // }
+
         return orderRepository.save(order);
     }
 
@@ -195,7 +262,8 @@ public class OrderServiceIMPL implements OrderService {
         }
 
         // Trừ số lượng khi đóng gói hoặc khi đã giao hàng
-        if (newStatus.equals(Constant.ISSUE_PACKING) || newStatus.equals(Constant.ISSUE_SHIPPED) || newStatus.equals(Constant.ISSUE_CONFIRMED)) {
+        if (newStatus.equals(Constant.ISSUE_PACKING) || newStatus.equals(Constant.ISSUE_SHIPPED)
+                || newStatus.equals(Constant.ISSUE_CONFIRMED)) {
             deductProductQuantity(orders);
         }
 
@@ -212,6 +280,7 @@ public class OrderServiceIMPL implements OrderService {
     private boolean isValidTransition(Integer current, Integer next) {
         return (current + 1 == next) || (next.equals(Constant.ISSUE_CANCELED)); // Chỉ đi từng bước hoặc hủy đơn
     }
+
     @Transactional
     protected void deductProductQuantity(Orders orders) {
         for (OrderDetails item : orders.getOrderDetails()) {
@@ -231,8 +300,6 @@ public class OrderServiceIMPL implements OrderService {
             productRepository.save(product);
         }
     }
-
-
 
     @Override
     public Optional<Orders> findById(Long id) {
