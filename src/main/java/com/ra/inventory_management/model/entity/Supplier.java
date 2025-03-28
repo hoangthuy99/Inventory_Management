@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Table(name = "supplier")
 @Getter
@@ -15,10 +16,12 @@ import java.time.LocalDateTime;
 public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length = 100)
     private String name;
+    @Column(name = "sub_code", length = 10, unique = true, nullable = false)
+    private String subCode;
 
     @Column(nullable = false, length = 50, unique = true)
     private String email;
@@ -46,5 +49,9 @@ public class Supplier {
     @PreUpdate
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
+    }
+
+    public static String generateOrderCode() {
+        return "SP" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8).toUpperCase();
     }
 }

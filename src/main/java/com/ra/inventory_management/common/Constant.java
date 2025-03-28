@@ -37,6 +37,8 @@ public class Constant {
     public static final String CATEGORY_SAMPLE = "/sample-excel/category.xlsx";
     public static final String CUSTOMER_SAMPLE = "/sample-excel/customer.xlsx";
     public static final String BRANCH_SAMPLE = "/sample-excel/branch.xlsx";
+    public static final String SUPPLIER_SAMPLE = "/sample-excel/supplier.xlsx";
+
 
     // Good Issue status
     public static final Integer GDI_PENDING = 1;
