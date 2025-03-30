@@ -90,10 +90,6 @@ public class WebSecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    @Bean
-    WebSecurityCustomizer webSecurityCustomizer() {
-        return (web -> web.ignoring().requestMatchers("/assets/**", "/fe/**", "/uploads/**"));
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

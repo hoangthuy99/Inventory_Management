@@ -17,21 +17,27 @@ public class Auth {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
     private Roles roles;
 
-    @Column(name = "permission", nullable = false)
-    private Integer permission;
-
+    @ManyToOne
+    @JoinColumn(name = "permission_id", nullable = false)
+    private Permission permission;
 
     @Column(name = "active_flag", nullable = false)
     private Integer activeFlag;
 
     @Column(name = "created_date", updatable = false)
-    private LocalDateTime createdDate;
+    private LocalDateTime createdDate = LocalDateTime.now();
 
     @Column(name = "update_date")
-    private LocalDateTime updateDate;
+    private LocalDateTime updateDate = LocalDateTime.now();
+
+
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();

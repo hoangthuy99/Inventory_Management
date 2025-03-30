@@ -1,6 +1,8 @@
 package com.ra.inventory_management.controller;
 
 
+import com.ra.inventory_management.common.ERoles;
+import com.ra.inventory_management.model.dto.UserDTO;
 import com.ra.inventory_management.model.dto.request.LoginRequest;
 import com.ra.inventory_management.model.dto.request.RegisterRequest;
 import com.ra.inventory_management.model.dto.response.BaseResponse;
@@ -10,7 +12,10 @@ import com.ra.inventory_management.model.entity.UserGoogle;
 import com.ra.inventory_management.model.entity.Users;
 import com.ra.inventory_management.reponsitory.UserRepository;
 import com.ra.inventory_management.service.AuthService;
+import com.ra.inventory_management.service.EmailService;
 import com.ra.inventory_management.service.UserService;
+import com.ra.inventory_management.service.impl.AuthServiceIMPL;
+import com.ra.inventory_management.service.impl.UserServiceIMPL;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -33,12 +38,23 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
-
-    private final UserRepository userRepository;
+    @Autowired
+    private UserServiceIMPL userServiceIMPL;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthServiceIMPL authService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    @PostMapping("/assign-role")
+    public ResponseEntity<String> assignRoleAndPermission(
+            @RequestParam String username,
+            @RequestParam ERoles role) {
+        authService.assignRoleAndPermission(username, role);
+        return ResponseEntity.ok("Assigned role " + role + " to user " + username);
+    }
 
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -52,23 +68,13 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Mật khẩu không khớp!");
         }
 
-        // Hash mật khẩu
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
-
-        // Tạo User mới
-        Users newUser = new Users();
-        newUser.setUserCode(request.getUserCode());
-        newUser.setUsername(request.getUsername());
-        newUser.setFullName(request.getFullName());
-        newUser.setEmail(request.getEmail());
-        newUser.setPhone(request.getPhone());
-        newUser.setAddress(request.getAddress());
-        newUser.setPassword(hashedPassword);
-
-        userRepository.save(newUser);
-        return ResponseEntity.ok("Đăng ký thành công!");
+        try {
+            Users user = userServiceIMPL.handleRegister(request);
+            return ResponseEntity.ok("Đăng ký thành công! Email đã được gửi.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-
     @GetMapping("/verify")
     public ResponseEntity<?> verifyAccount(@RequestParam String code) {
         Users user = userRepository.findByUserCode(code).orElse(null);
