@@ -81,10 +81,38 @@ public class BranchController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<Branch> updateBranch(@PathVariable Long id, @RequestBody Branch branchDetails) {
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateBranch(@PathVariable Long id, @ModelAttribute Branch branchDetails,
+                                          @RequestParam(value = "img", required = false) MultipartFile image
+    ) {
         Optional<Branch> existingBranch = branchService.findById(id);
         if (existingBranch.isPresent()) {
+            // Kiểm tra xem có upload file không
+            if (image != null && !image.isEmpty()) {
+                try {
+                    // Đọc ảnh từ input stream
+                    BufferedImage originalImage = ImageIO.read(image.getInputStream());
+                    if (originalImage == null) {
+                        return ResponseEntity.badRequest().body("Tệp tải lên không hợp lệ hoặc bị lỗi!");
+                    }
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+                    // Lưu file vào thư mục "uploads"
+                    Path uploadPath = Paths.get(uploadDir + "/branch");
+                    if (!Files.exists(uploadPath)) {
+                        Files.createDirectories(uploadPath);
+                    }
+                    Files.copy(image.getInputStream(), uploadPath.resolve(image.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi lưu ảnh!");
+                }
+            }
+
+            String imagePath = "uploads/branch/" + image.getOriginalFilename();
+            // Gọi service để lưu sản phẩm
+            branchDetails.setMapImage(imagePath);
+
+
             branchDetails.setId(id);
             return ResponseEntity.ok(branchService.save(branchDetails));
         }
