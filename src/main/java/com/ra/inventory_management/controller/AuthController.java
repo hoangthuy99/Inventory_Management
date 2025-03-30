@@ -1,6 +1,8 @@
 package com.ra.inventory_management.controller;
 
 
+import com.ra.inventory_management.common.ERoles;
+import com.ra.inventory_management.model.dto.UserDTO;
 import com.ra.inventory_management.model.dto.request.LoginRequest;
 import com.ra.inventory_management.model.dto.request.RegisterRequest;
 import com.ra.inventory_management.model.dto.response.BaseResponse;
@@ -12,8 +14,14 @@ import com.ra.inventory_management.model.entity.Users;
 import com.ra.inventory_management.reponsitory.RoleRepository;
 import com.ra.inventory_management.reponsitory.UserRepository;
 import com.ra.inventory_management.service.AuthService;
+
+import com.ra.inventory_management.service.EmailService;
+
 import com.ra.inventory_management.service.RoleService;
+
 import com.ra.inventory_management.service.UserService;
+import com.ra.inventory_management.service.impl.AuthServiceIMPL;
+import com.ra.inventory_management.service.impl.UserServiceIMPL;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -39,14 +47,25 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    @Autowired
+    private UserServiceIMPL userServiceIMPL;
 
-    private final UserRepository userRepository;
+    @Autowired
+    private AuthServiceIMPL authService;
 
     private final RoleService roleService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private UserRepository userRepository;
+
+
+    @PostMapping("/assign-role")
+    public ResponseEntity<String> assignRoleAndPermission(
+            @RequestParam String username,
+            @RequestParam ERoles role) {
+        authService.assignRoleAndPermission(username, role);
+        return ResponseEntity.ok("Assigned role " + role + " to user " + username);
+    }
 
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -56,6 +75,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("Mật khẩu không khớp!");
+        }
+
+        try {
+            Users user = userServiceIMPL.handleRegister(request);
+            return ResponseEntity.ok("Đăng ký thành công! Email đã được gửi.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
         Roles roles = roleService.getById(request.getRoleId());
@@ -75,8 +106,8 @@ public class AuthController {
 
         Users user = userRepository.save(newUser);
         return ResponseEntity.ok(new BaseResponse<>(user));
-    }
 
+    }
     @GetMapping("/verify")
     public ResponseEntity<?> verifyAccount(@RequestParam String code) {
         Users user = userRepository.findByUserCode(code).orElse(null);

@@ -29,6 +29,9 @@ public class RegisterRequest {
     private String phone;
     @NotNull(message = "Không được null")
     private String address;
-    private Integer activeFlag;
+
+    private Integer activeFlag = 1;
+
     private Long roleId;
+
 }

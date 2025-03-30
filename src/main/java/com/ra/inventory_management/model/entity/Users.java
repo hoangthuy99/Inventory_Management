@@ -24,8 +24,11 @@ public class Users implements UserDetails {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_code", length = 10, unique = true, nullable = false)
+    @Column(name = "user_code", length = 10, unique = true)
     private String userCode;
+
+    @Column(name = "verification_code", unique = true, length = 36)
+    private String verificationCode;
 
     @Column(name = "user_name", unique = true, length = 100, nullable = false)
     private String username;
@@ -45,7 +48,6 @@ public class Users implements UserDetails {
     @Column(name = "address", nullable = false, length = 200)
     private String address;
 
-
     @Column(name = "active_flag", nullable = false)
     private Integer activeFlag;
 
@@ -58,6 +60,9 @@ public class Users implements UserDetails {
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();
+        if (this.verificationCode == null) {
+            this.verificationCode = UUID.randomUUID().toString();
+        }
     }
 
     @PreUpdate
@@ -73,6 +78,8 @@ public class Users implements UserDetails {
     )
     private Set<Roles> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Auth> auths;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -93,18 +100,17 @@ public class Users implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-
     }
 
     @Override
     public boolean isEnabled() {
         return true;
-
     }
-  
+
     public static String generateUserCode() {
-        return "US" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 5).toUpperCase();
+        String code = "US" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 5).toUpperCase();
+        System.out.println("Generated User Code: " + code); // Kiểm tra output
+        return code;
     }
-
 
 }

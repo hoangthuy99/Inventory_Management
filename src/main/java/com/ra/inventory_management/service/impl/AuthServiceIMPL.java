@@ -1,10 +1,9 @@
 package com.ra.inventory_management.service.impl;
 
+import com.ra.inventory_management.common.ERoles;
 import com.ra.inventory_management.model.dto.response.JwtResponse;
-import com.ra.inventory_management.model.entity.UserGoogle;
-import com.ra.inventory_management.model.entity.Users;
-import com.ra.inventory_management.reponsitory.UserGoogleRepository;
-import com.ra.inventory_management.reponsitory.UserRepository;
+import com.ra.inventory_management.model.entity.*;
+import com.ra.inventory_management.reponsitory.*;
 import com.ra.inventory_management.service.AuthService;
 import com.ra.inventory_management.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +13,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,9 @@ public class AuthServiceIMPL implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserGoogleRepository userGoogleRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final AuthRepository authRepository;
 
 
     @Override
@@ -109,4 +113,38 @@ public class AuthServiceIMPL implements AuthService {
                 .roles(List.of("ROLE_STAFF"))
                 .build();
     }
+    @Override
+    public void assignRoleAndPermission(String username, ERoles roleName) {
+        // Tìm user trong database
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Lấy role dựa trên tên role
+        Roles role = roleRepository.findByRoleName(roleName);
+        if (role == null) {
+            throw new RuntimeException("Role not found");
+        }
+
+        // Lấy danh sách quyền (permissions) theo role
+        List<Permission> permissions = permissionRepository.findPermissionsByRole(role);
+
+
+        if (permissions == null || permissions.isEmpty()) {
+            throw new RuntimeException("Permissions not found for role: " + roleName);
+        }
+
+        for (Permission permission : permissions) {
+            Auth auth = Auth.builder()
+                    .user(user)
+                    .roles(role)
+                    .permission(permission)
+                    .activeFlag(1)
+                    .createdDate(LocalDateTime.now())
+                    .build();
+
+            authRepository.save(auth);
+        }
+
+    }
+
 }

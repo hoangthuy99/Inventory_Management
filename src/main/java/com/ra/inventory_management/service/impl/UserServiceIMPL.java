@@ -38,10 +38,15 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceIMPL implements UserService {
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private UserRepository userRepository;
+
 
     @Autowired
     private RoleRepository roleRepository;
+
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -53,32 +58,42 @@ public class UserServiceIMPL implements UserService {
     public Users handleRegister(RegisterRequest registerRequest) {
         Logger logger = LoggerFactory.getLogger(getClass());
 
+        // Kiểm tra username và email đã tồn tại chưa
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new IllegalArgumentException("Username đã tồn tại!");
         }
-
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new IllegalArgumentException("Email đã tồn tại!");
         }
 
 
         Users user = new Users();
-        user.setFullname(registerRequest.getFullname());
+
+        user.setUserCode(Users.generateUserCode()); // Mã user tự động tạo
+        user.setFullName(registerRequest.getFullName());
+
+
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
+        user.setPhone(registerRequest.getPhone());
+        user.setAddress(registerRequest.getAddress());
+        user.setActiveFlag(0); // Đánh dấu chưa kích hoạt
 
-        //  Mã hóa mật khẩu trước khi lưu
+        //  Mã hóa mật khẩu
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        Roles role = roleRepository.findByRoleName(ERoles.ROLE_STAFF);
+        if (role == null) {
+            throw new IllegalArgumentException("Không tìm thấy vai trò mặc định!");
+        }
 
         //  Gán quyền mặc định
         Set<Roles> defaultRoles = new HashSet<>();
         defaultRoles.add(roleRepository.findByRoleName(ERoles.ROLE_STAFF));
         user.setRoles(defaultRoles);
 
-        //  Tạo mã xác nhận
+        //  Tạo mã xác nhận email
         String verificationCode = UUID.randomUUID().toString();
-        user.setUserCode(verificationCode); // Tạm dùng field avatar để lưu mã xác nhận
-        user.setActiveFlag(0); // 0: chưa xác nhận
+        user.setVerificationCode(verificationCode); // Dùng field riêng để lưu mã xác nhận
 
         try {
             userRepository.save(user);

@@ -48,6 +48,8 @@ public class Orders {
 
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
+    @Transient
+    private List<Integer> qtyList; // Trường không lưu trong DB
 
     @Column(name = "note")
     private String note;
