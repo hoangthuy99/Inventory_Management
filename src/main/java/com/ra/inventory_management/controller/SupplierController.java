@@ -100,6 +100,8 @@ public class SupplierController {
         supplier.setName(supplierRequest.getName()); // Cập nhật dữ liệu từ request
         supplier.setAddress(supplierRequest.getAddress());
         supplier.setPhone(supplierRequest.getPhone());
+        supplier.setEmail(supplierRequest.getEmail());
+        supplier.setActiveFlag(supplierRequest.getActiveFlag());
 
         supplierService.save(supplier);
         return ResponseEntity.ok(supplier);
