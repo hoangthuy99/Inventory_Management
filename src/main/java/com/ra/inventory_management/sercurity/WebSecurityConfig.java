@@ -63,8 +63,6 @@ public class WebSecurityConfig {
                 authenticationProvider(authenticationProvider()).
                 authorizeHttpRequests(auth -> auth
                         .requestMatchers("/app/auth/**",
-                                "/app/category/**",
-                                "/app/product/**",
                                 "/uploads/**").permitAll()
                         .anyRequest().authenticated()
 

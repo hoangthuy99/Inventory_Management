@@ -20,7 +20,7 @@ public class RegisterRequest {
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Email bạn chưa đúng định dạng")
     private String email;
     @NotNull(message = "Không được null")
-    private String fullName;
+    private String fullname;
     @NotNull(message = "Không được null")
     @Pattern(regexp = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])\\S{8,}\\z", message = "Password chưa đúng định dạng, hãy nhập đủ 8 ký tự , có ký tự viết hoa và ký tự đặc biệt")
     private String password;
@@ -29,5 +29,9 @@ public class RegisterRequest {
     private String phone;
     @NotNull(message = "Không được null")
     private String address;
+
     private Integer activeFlag = 1;
+
+    private Long roleId;
+
 }

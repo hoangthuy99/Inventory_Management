@@ -25,6 +25,11 @@ public class RoleServiceIMPL implements RoleService {
     @Override
     public List<Roles> getAll() {
         return roleRepository.findAll();
+
     }
 
+    @Override
+    public Roles getById(Long id) {
+        return roleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vai trò với id: " + id));
+    }
 }

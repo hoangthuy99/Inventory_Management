@@ -63,7 +63,7 @@ public class AuthServiceIMPL implements AuthService {
         return JwtResponse.builder()
                 .accessToken(token)
                 .email(existingUser.getEmail())
-                .fullName(existingUser.getFullName())
+                .fullName(existingUser.getFullname())
                 .username(existingUser.getUsername())
                 .roles(existingUser.getRoles().stream().map(r -> String.valueOf(r.getRoleName())).toList())
                 .build();
@@ -110,7 +110,7 @@ public class AuthServiceIMPL implements AuthService {
                 .email(userGoogleExisted.getEmail())
                 .username(userGoogleExisted.getUsername())
                 .fullName(userGoogleExisted.getUsername())
-                .roles(List.of("ROLE_ADMIN"))
+                .roles(List.of("ROLE_STAFF"))
                 .build();
     }
     @Override

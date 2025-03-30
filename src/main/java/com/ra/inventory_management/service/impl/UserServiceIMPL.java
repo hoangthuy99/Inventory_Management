@@ -2,20 +2,29 @@ package com.ra.inventory_management.service.impl;
 
 import com.ra.inventory_management.model.dto.request.RegisterRequest;
 import com.ra.inventory_management.common.ERoles;
+import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.entity.Roles;
 import com.ra.inventory_management.model.entity.Users;
 
 
 import com.ra.inventory_management.reponsitory.RoleRepository;
 import com.ra.inventory_management.reponsitory.UserRepository;
+import com.ra.inventory_management.sercurity.UserDetail.UserDetailService;
+import com.ra.inventory_management.sercurity.UserDetail.UserPrincipal;
 import com.ra.inventory_management.service.EmailService;
 import com.ra.inventory_management.service.RoleService;
 import com.ra.inventory_management.service.UserService;
+import com.ra.inventory_management.util.PageableUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -33,12 +43,16 @@ public class UserServiceIMPL implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private EmailService emailService;
-
 
     @Override
     public Users handleRegister(RegisterRequest registerRequest) {
@@ -52,9 +66,13 @@ public class UserServiceIMPL implements UserService {
             throw new IllegalArgumentException("Email đã tồn tại!");
         }
 
+
         Users user = new Users();
+
         user.setUserCode(Users.generateUserCode()); // Mã user tự động tạo
         user.setFullName(registerRequest.getFullName());
+
+
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPhone(registerRequest.getPhone());
@@ -91,8 +109,18 @@ public class UserServiceIMPL implements UserService {
     }
 
     @Override
-    public Page<Users> getAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<Users> search(SearchRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Users userPrincipal = (Users) authentication.getPrincipal();
+
+        Pageable pageable = PageableUtil.create(request.getPageNum(), request.getPageSize(), request.getSortBy(), request.getSortType());
+
+        List<Users> filteredUsers = userRepository.searchUsers(request.getSearchKey(), request.getStatus(), pageable)
+                .stream()
+                .filter(u -> !u.getId().equals(userPrincipal.getId())) // Loại bỏ chính user hiện tại
+                .collect(Collectors.toList()); // Thu thập vào List
+
+        return new PageImpl<>(filteredUsers, pageable, filteredUsers.size());
     }
 
     @Override
@@ -111,30 +139,30 @@ public class UserServiceIMPL implements UserService {
     }
 
     @Override
-    public Users updateAcc(Users user, Long id) {
+    public Users update(RegisterRequest request, Long id) {
         Users userOld = findById(id);
-        if(!user.getUsername().equals(userOld.getUsername())) {
-            if (userRepository.existsByUsername(user.getUsername())) {
+        if (!request.getUsername().equals(userOld.getUsername())) {
+            if (userRepository.existsByUsername(request.getUsername())) {
                 throw new RuntimeException("Username is exists");
             }
         }
 
-        Set<Roles> roles = userOld.getRoles();
+        Roles roles = roleRepository.findById(request.getRoleId()).
+                orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại vai trò với id: " + request.getRoleId()));
 
-        Users users = Users.builder()
-                .id(user.getId())
-                .userCode(user.getUserCode())
-                .username(user.getUsername())
-                .fullName(userOld.getFullName())
-                .email(user.getEmail())
-                .address(user.getAddress())
-                .phone(user.getPhone())
-                .activeFlag(user.getActiveFlag())
-                .createdDate(user.getCreatedDate())
-                .updateDate(user.getUpdateDate())
-                .roles(roles)
-                .build();
-        return userRepository.save(users);
+        Set<Roles> rolesExits = userOld.getRoles();
+        rolesExits.removeAll(userOld.getRoles());
+        rolesExits.add(roles);
+
+
+        userOld.setFullname(request.getFullname());
+        userOld.setAddress(request.getAddress());
+        userOld.setPhone(request.getPhone());
+        userOld.setEmail(request.getEmail());
+        userOld.setActiveFlag(request.getActiveFlag());
+        userOld.setRoles(rolesExits);
+
+        return userRepository.save(userOld);
     }
 
     @Override
