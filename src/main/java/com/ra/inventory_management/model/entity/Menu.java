@@ -32,7 +32,7 @@ public class Menu {
     private Long parentId; // Function cha (nếu có)
 
     @Column(name = "active_fg", nullable = false)
-    private Boolean activeFlag = true; // Trạng thái kích hoạt
+    private Integer activeFlag = 1; // Trạng thái kích hoạt
 
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate = LocalDateTime.now();

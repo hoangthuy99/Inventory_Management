@@ -16,6 +16,7 @@ public class RegisterRequest {
     @Size(min = 6, max = 100, message = "số kí tự không chính xác")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "không chứa kí tự đặc biệt")
     private String username;
+
     private String userCode;
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Email bạn chưa đúng định dạng")
     private String email;

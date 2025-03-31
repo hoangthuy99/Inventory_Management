@@ -1,8 +1,11 @@
 package com.ra.inventory_management.controller;
 
+import com.ra.inventory_management.model.dto.request.SearchRequest;
+import com.ra.inventory_management.model.entity.Menu;
 import com.ra.inventory_management.model.entity.Permission;
 import com.ra.inventory_management.service.PermissionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/app/permissions")
+@RequestMapping("/app/permission")
 @RequiredArgsConstructor
 public class PermissionController {
     private final PermissionService permissionService;
@@ -54,5 +57,10 @@ public class PermissionController {
     public ResponseEntity<Void> deletePermission(@PathVariable Long id) {
         permissionService.deletePermission(id);
         return ResponseEntity.noContent().build();
+    }
+    @PostMapping("/search")
+    public ResponseEntity<Page<Permission>> searchMenus(@RequestBody SearchRequest request) {
+        Page<Permission> permissions = permissionService.search(request);
+        return ResponseEntity.ok(permissions);
     }
 }

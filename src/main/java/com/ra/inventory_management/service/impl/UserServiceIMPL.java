@@ -9,10 +9,7 @@ import com.ra.inventory_management.model.entity.Users;
 
 import com.ra.inventory_management.reponsitory.RoleRepository;
 import com.ra.inventory_management.reponsitory.UserRepository;
-import com.ra.inventory_management.sercurity.UserDetail.UserDetailService;
-import com.ra.inventory_management.sercurity.UserDetail.UserPrincipal;
 import com.ra.inventory_management.service.EmailService;
-import com.ra.inventory_management.service.RoleService;
 import com.ra.inventory_management.service.UserService;
 import com.ra.inventory_management.util.PageableUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +18,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,11 +37,6 @@ public class UserServiceIMPL implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
-
-    @Autowired
-    private RoleRepository roleRepository;
-
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -70,9 +60,7 @@ public class UserServiceIMPL implements UserService {
         Users user = new Users();
 
         user.setUserCode(Users.generateUserCode()); // Mã user tự động tạo
-        user.setFullName(registerRequest.getFullName());
-
-
+        user.setFullname(registerRequest.getFullname());
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPhone(registerRequest.getPhone());
