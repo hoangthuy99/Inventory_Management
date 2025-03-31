@@ -58,6 +58,8 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     @PostMapping("/assign-role")
     public ResponseEntity<String> assignRoleAndPermission(
@@ -75,39 +77,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             return ResponseEntity.badRequest().body("Mật khẩu không khớp!");
         }
 
         try {
+            // Xử lý đăng ký người dùng
             Users user = userServiceIMPL.handleRegister(request);
             return ResponseEntity.ok("Đăng ký thành công! Email đã được gửi.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
-
-        Roles roles = roleService.getById(request.getRoleId());
-
-
-        // Tạo User mới
-        Users newUser = new Users();
-        newUser.setUserCode(request.getUserCode());
-        newUser.setUsername(request.getUsername());
-        newUser.setFullname(request.getFullname());
-        newUser.setEmail(request.getEmail());
-        newUser.setPhone(request.getPhone());
-        newUser.setAddress(request.getAddress());
-        newUser.setPassword(hashedPassword);
-        newUser.setActiveFlag(request.getActiveFlag());
-        newUser.setRoles(Set.of(roles));
-
-        Users user = userRepository.save(newUser);
-        return ResponseEntity.ok(new BaseResponse<>(user));
-
     }
+
     @GetMapping("/verify")
     public ResponseEntity<?> verifyAccount(@RequestParam String code) {
         Users user = userRepository.findByUserCode(code).orElse(null);

@@ -1,5 +1,6 @@
 package com.ra.inventory_management.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,10 +27,13 @@ public class Permission {
     @Column(name = "active_flag", nullable = false)
     private Integer activeFlag;
 
-    @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<PermissionDetail> permissionDetails; // Danh sách các chức năng cụ thể của quyền
-    @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Auth> auths;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
