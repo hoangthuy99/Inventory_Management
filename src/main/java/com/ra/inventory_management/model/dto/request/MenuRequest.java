@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -23,4 +24,8 @@ public class MenuRequest {
     private Long parentId;
 
     private Integer activeFlag = 1;
+
+    private Long roleId ;
+
+
 }
