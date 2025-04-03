@@ -14,5 +14,5 @@ public interface AuthService {
 
     JwtResponse oauthLogin(Map<String, Object> claims);
 
-    void assignRoleAndPermission(String username, ERoles roleName);
+
 }

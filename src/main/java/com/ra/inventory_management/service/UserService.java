@@ -16,6 +16,8 @@ public interface UserService {
 
     Users handleRegister(RegisterRequest registerRequest);
 
+    List<Users> getAll();
+
     Page<Users> search(SearchRequest request);
 
     Users findById(Long id);
@@ -29,4 +31,6 @@ public interface UserService {
     Optional<Users> findByUsername(String username);
 
     List<Users> searchByName(String keyword);
+
+
 }

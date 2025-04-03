@@ -56,9 +56,7 @@ public class UserServiceIMPL implements UserService {
             throw new IllegalArgumentException("Email đã tồn tại!");
         }
 
-
         Users user = new Users();
-
         user.setUserCode(Users.generateUserCode()); // Mã user tự động tạo
         user.setFullname(registerRequest.getFullname());
         user.setUsername(registerRequest.getUsername());
@@ -67,26 +65,28 @@ public class UserServiceIMPL implements UserService {
         user.setAddress(registerRequest.getAddress());
         user.setActiveFlag(0); // Đánh dấu chưa kích hoạt
 
-        //  Mã hóa mật khẩu
+        // Mã hóa mật khẩu
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+
+        // Lấy vai trò mặc định
         Roles role = roleRepository.findByRoleName(ERoles.ROLE_STAFF);
         if (role == null) {
             throw new IllegalArgumentException("Không tìm thấy vai trò mặc định!");
         }
 
-        //  Gán quyền mặc định
+        // Gán quyền mặc định
         Set<Roles> defaultRoles = new HashSet<>();
-        defaultRoles.add(roleRepository.findByRoleName(ERoles.ROLE_STAFF));
+        defaultRoles.add(role);
         user.setRoles(defaultRoles);
 
-        //  Tạo mã xác nhận email
+        // Tạo mã xác nhận email
         String verificationCode = UUID.randomUUID().toString();
-        user.setVerificationCode(verificationCode); // Dùng field riêng để lưu mã xác nhận
+        user.setVerificationCode(verificationCode); // Lưu mã xác nhận vào user
 
         try {
             userRepository.save(user);
 
-            //  Gửi email xác nhận
+            // Gửi email xác nhận
             emailService.sendVerificationEmail(user.getEmail(), verificationCode);
 
             return user;
@@ -94,6 +94,12 @@ public class UserServiceIMPL implements UserService {
             logger.error("Lỗi khi lưu user: " + e.getRootCause().getMessage());
             throw new IllegalArgumentException("Lỗi khi lưu user: " + e.getRootCause().getMessage());
         }
+    }
+
+
+    @Override
+    public List<Users> getAll() {
+        return  userRepository.findAll();
     }
 
     @Override

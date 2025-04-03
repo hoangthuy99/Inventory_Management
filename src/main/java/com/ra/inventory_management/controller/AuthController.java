@@ -61,13 +61,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
 
-    @PostMapping("/assign-role")
-    public ResponseEntity<String> assignRoleAndPermission(
-            @RequestParam String username,
-            @RequestParam ERoles role) {
-        authService.assignRoleAndPermission(username, role);
-        return ResponseEntity.ok("Assigned role " + role + " to user " + username);
-    }
+
 
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -118,10 +112,6 @@ public class AuthController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
-    @GetMapping("roles")
-    public ResponseEntity<?> getAllRoles() {
-        List<Roles> roles = roleService.getAll();
-        return ResponseEntity.ok().body(new BaseResponse<>(roles));
-    }
+
 
 }
