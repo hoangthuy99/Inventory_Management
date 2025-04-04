@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -43,38 +44,34 @@ public class MenuServiceIMPL implements MenuService {
    menuRepository.deleteById(id);
     }
 
-    @Override
-    public Menu create(MenuRequest request) {
-        if (menuRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Tên quyền đã tồn tại");
-        }
-        Menu menu = new Menu();
-        Roles roles = roleRepository.findById(request.getRoleId()).
-                orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại vai trò với id: " + request.getRoleId()));
-
-        Set<Roles> rolesExits = menu.getRoles();
-        rolesExits.removeAll(menu.getRoles());
-        rolesExits.add(roles);
-        menu.setCode(request.getCode());
-        menu.setName(request.getName());
-        menu.setPath(request.getPath());
-        menu.setIcon(request.getIcon());
-        menu.setParentId(request.getParentId());
-        menu.setActiveFlag(request.getActiveFlag());
-        menu.setRoles(rolesExits);
-
-        return menuRepository.save(menu);
-    }
+//    @Override
+//    public Menu create(MenuRequest request) {
+//        if (menuRepository.existsByName(request.getName())) {
+//            throw new RuntimeException("Tên quyền đã tồn tại");
+//        }
+//        Menu menu = new Menu();
+//        Roles roles = roleRepository.findById(request.getRoleId()).
+//                orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại vai trò với id: " + request.getRoleId()));
+//
+//        Set<Roles> rolesExits = menu.getRoles();
+//        rolesExits.removeAll(menu.getRoles());
+//        rolesExits.add(roles);
+//        menu.setCode(request.getCode());
+//        menu.setName(request.getName());
+//        menu.setPath(request.getPath());
+//        menu.setIcon(request.getIcon());
+//        menu.setParentId(request.getParentId());
+//        menu.setActiveFlag(request.getActiveFlag());
+//        menu.setRoles(rolesExits);
+//
+//        return menuRepository.save(menu);
+//    }
 
     @Override
     public Menu update(MenuRequest request, Long id) {
         // Tìm menu theo id
         Menu menu = menuRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Menu không tồn tại với id: " + id));
-
-        // Kiểm tra roleId
-        Roles role = roleRepository.findById(request.getRoleId())
-                .orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại với id: " + request.getRoleId()));
 
         // Cập nhật các thuộc tính menu
         menu.setCode(request.getCode());
@@ -85,12 +82,19 @@ public class MenuServiceIMPL implements MenuService {
         menu.setActiveFlag(request.getActiveFlag());
         menu.setUpdatedDate(LocalDateTime.now());
 
-        // Gán vai trò vào menu
-        Set<Roles> roles = new HashSet<>();
-        roles.add(role);  // Thêm một vai trò duy nhất vào Set
-        menu.setRoles(roles);  // Gán Set roles vào menu
+        // Xử lý danh sách roleIds
+        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
+            Set<Roles> roles = request.getRoleIds().stream()
+                    .map(roleId -> roleRepository.findById(roleId)
+                            .orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại với id: " + roleId)))
+                    .collect(Collectors.toSet());
 
-        // Lưu menu với vai trò đã cập nhật
+            menu.setRoles(roles); // Gán danh sách roles
+        } else {
+            menu.setRoles(new HashSet<>()); // Không có roles
+        }
+
+        // Lưu menu với roles đã cập nhật
         return menuRepository.save(menu);
     }
 

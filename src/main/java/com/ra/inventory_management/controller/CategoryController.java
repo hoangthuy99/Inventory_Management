@@ -58,7 +58,8 @@ public class CategoryController {
             // Chuyển đổi CategoryRequest thành Categories entity
             Categories category = new Categories();
             category.setName(categoryRequest.getName());
-            category.setCode(categoryRequest.getCode());
+            String generatedCode = CategoryRequest.generateUserCode();
+            category.setCode(generatedCode);
             category.setDescription(categoryRequest.getDescription());
             category.setActiveFlag(categoryRequest.getActiveFlag());
 

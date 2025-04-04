@@ -29,10 +29,10 @@ public class MenuController {
         return ResponseEntity.ok(menuService.getAll());
     }
 
-    @PostMapping
-    public ResponseEntity<Menu> createMenu(@RequestBody MenuRequest menu) {
-        return ResponseEntity.ok(menuService.create(menu));
-    }
+//    @PostMapping
+//    public ResponseEntity<Menu> createMenu(@RequestBody MenuRequest menu) {
+//        return ResponseEntity.ok(menuService.create(menu));
+//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Menu> updateMenu(@RequestBody MenuRequest request, @PathVariable Long id) {
