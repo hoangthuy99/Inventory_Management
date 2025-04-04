@@ -17,6 +17,7 @@ public class OrderRequest {
     private Long id;
     private Long customerId;
     private Long branchId;
+    private Integer shipperId;
     private BigDecimal totalPrice;
     private Integer status = 1;
     private LocalDateTime plannedExportDate;

@@ -15,11 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -94,8 +93,14 @@ public class AuthServiceIMPL implements AuthService {
         UserGoogle userGoogleExisted = userGoogleRepository.findByEmail(claims.get("email").toString()).orElse(null);
 
         // if not exist save to database
+        StringBuilder prefix = new StringBuilder();
+        Arrays.stream(claims.get("name").toString().split("\\s+")) // Tách theo khoảng trắng
+                .forEach(word -> prefix.append(word.charAt(0)));
+        String code = prefix + LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+
         if (userGoogleExisted == null) {
             UserGoogle userGoogle = UserGoogle.builder()
+                    .code(code)
                     .username(claims.get("name").toString())
                     .email(claims.get("email").toString())
                     .avatar(claims.get("picture").toString())

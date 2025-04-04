@@ -3,12 +3,18 @@ package com.ra.inventory_management.controller;
 import com.ra.inventory_management.model.dto.request.RegisterRequest;
 import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.dto.response.BaseResponse;
+import com.ra.inventory_management.model.entity.UserGoogle;
 import com.ra.inventory_management.model.entity.Users;
+import com.ra.inventory_management.reponsitory.UserGoogleRepository;
 import com.ra.inventory_management.service.RoleService;
 import com.ra.inventory_management.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +24,8 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserGoogleRepository userGoogleRepository;
 
     @Autowired
     private RoleService roleService;
@@ -49,5 +57,11 @@ public class UserController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.ok().body(new BaseResponse<>(true));
+    }
+
+    @GetMapping("getAllUsersGG")
+    public ResponseEntity<?> getAllUserGoogle() {
+        List<UserGoogle> userGoogles = userGoogleRepository.findAll();
+        return ResponseEntity.ok().body(new BaseResponse<>(userGoogles));
     }
 }

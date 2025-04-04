@@ -30,6 +30,8 @@ public class OrderServiceIMPL implements OrderService {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
     private final AuthService authService;
+    @Autowired
+    private UserGoogleRepository userGoogleRepository;
 
     public OrderServiceIMPL(AuthService authService) {
         this.authService = authService;
@@ -119,6 +121,13 @@ public class OrderServiceIMPL implements OrderService {
                     .orElseThrow(() -> new RuntimeException("Chi nhánh không tồn tại"));
             order.setBranch(branch);
         }
+
+        if (orderRequest.getStatus().equals(Constant.GDI_WAITDELIVERY)) {
+            UserGoogle userGoogle = userGoogleRepository.findById(orderRequest.getShipperId())
+                    .orElseThrow(() -> new RuntimeException("Chi nhánh không tồn tại"));
+            order.setShipper(userGoogle);
+        }
+
         if (orderRequest.getPlannedExportDate() != null) {
             if (orderRequest.getPlannedExportDate().isBefore(LocalDateTime.now())) {
                 throw new RuntimeException("Ngày xuất kho kế hoạch phải từ hôm nay trở đi.");
@@ -329,4 +338,9 @@ public class OrderServiceIMPL implements OrderService {
         orderRepository.save(order);
     }
 
+    @Override
+    public List<Orders> findByIdList(List<Long> ids) {
+        List<Orders> order = orderRepository.findAllById(ids);
+        return order;
+    }
 }

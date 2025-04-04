@@ -14,6 +14,7 @@ public interface OrderService {
     Orders save(OrderRequest orderRequest);
 
     Orders update(OrderRequest orderRequest);
+
     Orders updateOrderStatus(Long orderId, Integer newStatus);
 
     Optional<Orders> findById(Long id);
@@ -27,4 +28,5 @@ public interface OrderService {
 
     void deleteOr(Long orderId);
 
+    List<Orders> findByIdList(List<Long> id);
 }
