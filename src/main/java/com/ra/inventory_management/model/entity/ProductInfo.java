@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -61,5 +62,9 @@ public class ProductInfo {
 
     public void setImg(String img) {
         this.img = img;
+    }
+
+    public static String generateOrderCode() {
+        return "PD" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8).toUpperCase();
     }
 }

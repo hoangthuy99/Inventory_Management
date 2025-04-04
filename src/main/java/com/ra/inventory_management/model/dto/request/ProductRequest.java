@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductRequest {
     @NotEmpty(message = "Không được bỏ trống Product name")
     private String name;
-    @Pattern(regexp = "^[A-Za-z]{2}\\d{3}$", message = "Code phải có 5 ký tự, bắt đầu bằng 2 chữ cái và 3 số!")
     private String code;
     @NotEmpty(message = "Không được bỏ trống mô tả sản phẩm")
     private String description;

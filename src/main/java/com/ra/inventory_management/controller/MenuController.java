@@ -11,16 +11,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
 @RestController
 @RequestMapping("/app/menu")
 @RequiredArgsConstructor
 public class MenuController {
-    private final MenuService menuService;
 
+    public final MenuService menuService;
     @GetMapping("/{id}")
     public ResponseEntity<Menu> getMenuById(@PathVariable Long id) {
-        Optional<Menu> menu = menuService.findById(id);
+        Optional<Menu> menu = menuService.getByIdMenu(id);
         return menu.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -30,10 +29,10 @@ public class MenuController {
         return ResponseEntity.ok(menuService.getAll());
     }
 
-    @PostMapping
-    public ResponseEntity<Menu> createMenu(@RequestBody Menu menu) {
-        return ResponseEntity.ok(menuService.save(menu));
-    }
+//    @PostMapping
+//    public ResponseEntity<Menu> createMenu(@RequestBody MenuRequest menu) {
+//        return ResponseEntity.ok(menuService.create(menu));
+//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Menu> updateMenu(@RequestBody MenuRequest request, @PathVariable Long id) {
@@ -50,4 +49,5 @@ public class MenuController {
         Page<Menu> menus = menuService.search(request);
         return ResponseEntity.ok(menus);
     }
+
 }

@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,4 +52,6 @@ public class Categories {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
+
+
 }

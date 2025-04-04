@@ -78,8 +78,6 @@ public class Users implements UserDetails {
     )
     private Set<Roles> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Auth> auths;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

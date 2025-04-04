@@ -29,8 +29,7 @@ public class AuthServiceIMPL implements AuthService {
     private final JwtTokenUtil jwtTokenUtil;
     private final UserGoogleRepository userGoogleRepository;
     private final RoleRepository roleRepository;
-    private final PermissionRepository permissionRepository;
-    private final AuthRepository authRepository;
+
 
 
     @Override
@@ -119,38 +118,7 @@ public class AuthServiceIMPL implements AuthService {
                 .build();
     }
 
-    @Override
-    public void assignRoleAndPermission(String username, ERoles roleName) {
-        // Tìm user trong database
-        Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Lấy role dựa trên tên role
-        Roles role = roleRepository.findByRoleName(roleName);
-        if (role == null) {
-            throw new RuntimeException("Role not found");
-        }
-
-        // Lấy danh sách quyền (permissions) theo role
-        List<Permission> permissions = permissionRepository.findPermissionsByRole(role);
-
-
-        if (permissions == null || permissions.isEmpty()) {
-            throw new RuntimeException("Permissions not found for role: " + roleName);
-        }
-
-        for (Permission permission : permissions) {
-            Auth auth = Auth.builder()
-                    .user(user)
-                    .roles(role)
-                    .permission(permission)
-                    .activeFlag(1)
-                    .createdDate(LocalDateTime.now())
-                    .build();
-
-            authRepository.save(auth);
-        }
 
     }
 
-}
+

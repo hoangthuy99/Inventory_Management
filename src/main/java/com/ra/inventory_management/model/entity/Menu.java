@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,7 +25,13 @@ public class Menu {
 
     @Column(nullable = false)
     private String name; // Tên function (VD: "Create Category", "Delete Category")
-
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "menu_role",
+            joinColumns = @JoinColumn(name = "menu_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Roles> roles = new HashSet<>();
     private String path; // Đường dẫn API hoặc URL giao diện
 
     private String icon; // Icon đại diện cho function
