@@ -34,11 +34,15 @@ public class Orders {
     @JoinColumn(name = "branch_id")
     private Branch branch;
 
+    @ManyToOne
+    @JoinColumn(name = "shipper_id")
+    private UserGoogle shipper;
+
     @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @Column(name = "status", nullable = false)
-    private Integer status = 1 ;
+    private Integer status = 1;
 
     @Column(name = "planned_export_date", nullable = false)
     private LocalDateTime plannedExportDate;

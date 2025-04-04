@@ -20,6 +20,11 @@ public class UserGoogle {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @Size(max = 200)
+    @NotNull
+    @Column(name = "code", nullable = false)
+    private String code;
+
     @Size(max = 255)
     @NotNull
     @Column(name = "username", nullable = false)

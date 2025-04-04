@@ -59,6 +59,13 @@ public class OrderController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Lấy đơn hàng theo danh sách id
+    @GetMapping("getByIdList")
+    public ResponseEntity<?> getOrderByIdList(@RequestParam("ids") List<Long> ids) {
+        List<Orders> orders = orderService.findByIdList(ids);
+        return ResponseEntity.ok().body(new BaseResponse<>(orders));
+    }
+
     // Tìm đơn hàng theo ID khách hàng và trạng thái
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @GetMapping("/{customerId}/{orderId}/{status}")
