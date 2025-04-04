@@ -15,7 +15,7 @@ public interface MenuService {
     List<Menu> getAll();
     void delete(Long id);
 
-    Menu create(MenuRequest request);
+//    Menu create(MenuRequest request);
 
     Menu update(MenuRequest request, Long id);
     Page<Menu> search(SearchRequest request);

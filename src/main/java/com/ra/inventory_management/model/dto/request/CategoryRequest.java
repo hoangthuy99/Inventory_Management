@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -14,10 +16,13 @@ import lombok.NoArgsConstructor;
 public class CategoryRequest {
     @NotBlank(message = "CategoryName không được trống!")
     private String name;
-    @NotBlank(message = "Hãy nhập mô tả code!")
-    @Pattern(regexp = "^[A-Za-z]{2}\\d{3}$", message = "Code phải có 5 ký tự, bắt đầu bằng 2 chữ cái và 3 số!")
     private String code;
     @NotBlank(message = "Hãy nhập mô tả danh mục!")
     private String description;
     private Integer activeFlag = 1;
+    public static String generateUserCode() {
+        String code = "CT" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 5).toUpperCase();
+        System.out.println("Generated User Code: " + code); // Kiểm tra output
+        return code;
+    }
 }

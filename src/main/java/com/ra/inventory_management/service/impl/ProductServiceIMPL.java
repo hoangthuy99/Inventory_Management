@@ -77,7 +77,8 @@ public class ProductServiceIMPL implements ProductService {
 
             ProductInfo product = new ProductInfo();
             product.setName(productRequest.getName());
-            product.setCode(productRequest.getCode());
+            String generatedCode = ProductInfo.generateOrderCode();
+            product.setCode(generatedCode);
             product.setQty(productRequest.getQty());
             product.setPrice(BigDecimal.valueOf(productRequest.getPrice()));
             product.setDescription(productRequest.getDescription());
