@@ -94,7 +94,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/app/auth/login", "POST"),
                 Pair.of("/app/auth/oauth-login", "POST"),
                 Pair.of("/app/auth/oauth-register", "POST"),
-                Pair.of("/uploads/branch/", "GET")
+                Pair.of("/uploads", "GET")
         );
         System.out.println(request.getServletPath());
         for (Pair<String, String> bypassToken : bypassTokens) {
