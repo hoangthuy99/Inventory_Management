@@ -4,12 +4,16 @@ import com.ra.inventory_management.model.dto.request.MenuRequest;
 import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.entity.Menu;
 import com.ra.inventory_management.model.entity.Roles;
+import com.ra.inventory_management.model.entity.Users;
 import com.ra.inventory_management.reponsitory.MenuRepository;
 import com.ra.inventory_management.reponsitory.RoleRepository;
+import com.ra.inventory_management.reponsitory.UserRepository;
 import com.ra.inventory_management.sercurity.exception.ResourceNotFoundException;
 import com.ra.inventory_management.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +28,8 @@ import java.util.stream.Collectors;
 public class MenuServiceIMPL implements MenuService {
     private final MenuRepository menuRepository;
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+
     @Override
     public Optional<Menu> findById(Long id) {
         return menuRepository.findById(id);
@@ -41,7 +47,7 @@ public class MenuServiceIMPL implements MenuService {
 
     @Override
     public void delete(Long id) {
-   menuRepository.deleteById(id);
+        menuRepository.deleteById(id);
     }
 
 //    @Override
@@ -98,10 +104,18 @@ public class MenuServiceIMPL implements MenuService {
         return menuRepository.save(menu);
     }
 
-
-
     @Override
     public Page<Menu> search(SearchRequest request) {
         return null;
+    }
+
+    @Override
+    public List<Menu> getMenuByUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Users userPrincipal = (Users) authentication.getPrincipal();
+
+        List<Menu> menus = userRepository.findById(userPrincipal.getId()).orElse(new Users()).getRoles().get(0).getMenus();
+
+        return menus;
     }
 }

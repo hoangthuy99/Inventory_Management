@@ -1,10 +1,13 @@
 package com.ra.inventory_management.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ra.inventory_management.common.ERoles;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -19,6 +22,10 @@ public class Roles {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    @JsonBackReference
+    private List<Menu> menus;
 
     @Column(name = "role_name", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
@@ -45,7 +52,6 @@ public class Roles {
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
     }
-
 
 
 }

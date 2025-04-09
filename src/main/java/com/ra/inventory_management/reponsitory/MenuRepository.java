@@ -8,12 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MenuRepository extends JpaRepository<Menu,Long> {
+public interface MenuRepository extends JpaRepository<Menu, Long> {
 
-    boolean existsByName (String name);
+    boolean existsByName(String name);
+
     @Query("""
                 SELECT m FROM Menu m
                     where (
@@ -28,7 +30,7 @@ public interface MenuRepository extends JpaRepository<Menu,Long> {
             @Param("status") Integer status,
             Pageable pageable
     );
+
     @Query("SELECT m FROM Menu m LEFT JOIN FETCH m.roles WHERE m.id = :id")
     Optional<Menu> findByIdWithRoles(@Param("id") Long id);
-
 }

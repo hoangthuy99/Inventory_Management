@@ -25,6 +25,7 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, In
                         OR p.branch.name LIKE %:searchKey%
                     )
                     AND (:status IS NULL OR :status = -1 OR p.status = :status)
+                    order by p.status asc
             """)
     Page<PurchaseOrder> searchPurchase(
             @Param("searchKey") String searchKey,
