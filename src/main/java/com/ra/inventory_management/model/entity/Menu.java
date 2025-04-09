@@ -1,6 +1,8 @@
 
 package com.ra.inventory_management.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,12 +28,14 @@ public class Menu {
     @Column(nullable = false)
     private String name; // Tên function (VD: "Create Category", "Delete Category")
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonManagedReference
     @JoinTable(
             name = "menu_role",
             joinColumns = @JoinColumn(name = "menu_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Roles> roles = new HashSet<>();
+
     private String path; // Đường dẫn API hoặc URL giao diện
 
     private String icon; // Icon đại diện cho function

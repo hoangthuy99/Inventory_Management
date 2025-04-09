@@ -93,6 +93,7 @@ public class OrderServiceIMPL implements OrderService {
                     .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0) // Kiểm tra NULL
                     .productInfo(productInfo)
                     .productUnit(itemRequest.getProductUnit())
+                    .unitPrice(itemRequest.getUnitPrice())
                     .totalPrice(productInfo.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQty())))
                     .build();
 
@@ -202,6 +203,7 @@ public class OrderServiceIMPL implements OrderService {
                     orderDetails.setProductUnit(itemRequest.getProductUnit());
                     orderDetails.setDeleteFg(itemRequest.getDeleteFg());
                     orderDetails.setProductUnit(itemRequest.getProductUnit());
+                    orderDetails.setUnitPrice(itemRequest.getUnitPrice());
                     updatedItems.add(orderDetails);
                 } else {
                     OrderDetails newOrderDetails = OrderDetails.builder()
@@ -210,6 +212,7 @@ public class OrderServiceIMPL implements OrderService {
                             .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0)
                             .productInfo(productInfo)
                             .productUnit(itemRequest.getProductUnit())
+                            .unitPrice(itemRequest.getUnitPrice())
                             .totalPrice(productInfo.getPrice())
                             .build();
                     updatedItems.add(newOrderDetails);
@@ -217,42 +220,6 @@ public class OrderServiceIMPL implements OrderService {
             }
             order.setOrderDetails(updatedItems);
         }
-
-        // If status ís approved plus stock of product
-        // if (orderRequest.getStatus().equals(Constant.GDI_APPROVED)) {
-        //     for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
-        //         ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
-        //         OrderDetails orderDetailExist = orderDetailRepository.findById(items.getId())
-        //                 .orElse(new OrderDetails());
-
-        //         if (productInfo != null) {
-        //             Integer quantityUpdated = productInfo.getQty() - items.getQty();
-
-        //             if (items.getQty() > orderDetailExist.getQty()) {
-        //                 quantityUpdated = productInfo.getQty() - (items.getQty() - orderDetailExist.getQty());
-        //             } else if (items.getQty() < orderDetailExist.getQty()) {
-        //                 quantityUpdated = productInfo.getQty() + (orderDetailExist.getQty() - items.getQty());
-        //             }
-
-        //             productInfo.setQty(quantityUpdated);
-        //             productRepository.save(productInfo);
-        //         }
-        //     }
-        // }
-
-        // // If status is cancel plus stock of product
-        // if (orderRequest.getStatus().equals(Constant.GDI_CANCELED)) {
-        //     for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
-        //         ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
-
-        //         if (productInfo != null) {
-        //             Integer quantityUpdated = productInfo.getQty() + items.getQty();
-
-        //             productInfo.setQty(quantityUpdated);
-        //             productRepository.save(productInfo);
-        //         }
-        //     }
-        // }
 
         return orderRepository.save(order);
     }

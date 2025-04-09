@@ -27,6 +27,7 @@ public class OrderRequest {
     private String orderCode;
     private List<OrderDetailRequest> orderDetailsRequest;
     private Integer deleteFg;
+    private Integer unitPrice;
 
     //    private Users users;
     public BigDecimal getTotalPrice() {
