@@ -130,9 +130,9 @@ public class OrderServiceIMPL implements OrderService {
         }
 
         if (orderRequest.getPlannedExportDate() != null) {
-            if (orderRequest.getPlannedExportDate().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Ngày xuất kho kế hoạch phải từ hôm nay trở đi.");
-            }
+//            if (orderRequest.getPlannedExportDate().isBefore(LocalDateTime.now())) {
+//                throw new RuntimeException("Ngày xuất kho kế hoạch phải từ hôm nay trở đi.");
+//            }
             order.setPlannedExportDate(orderRequest.getPlannedExportDate());
         }
 
