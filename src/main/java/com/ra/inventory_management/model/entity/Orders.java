@@ -73,6 +73,10 @@ public class Orders {
     @Where(clause = "delete_fg = false OR delete_fg IS NULL")
     private List<OrderDetails> orderDetails;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by")
+    private Users createdBy;
+
     @PrePersist
     protected void onCreate() {
         createdDate = LocalDateTime.now();

@@ -17,7 +17,7 @@ public interface OrderService {
 
     Orders updateOrderStatus(Long orderId, Integer newStatus);
 
-    Optional<Orders> findById(Long id);
+    Orders findById(Long id);
 
     Orders getByIdAndStatus(Long customerId, Long orderId, Integer status);
 

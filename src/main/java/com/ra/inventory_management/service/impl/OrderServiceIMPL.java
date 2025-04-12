@@ -5,10 +5,13 @@ import com.ra.inventory_management.model.dto.request.OrderDetailRequest;
 import com.ra.inventory_management.model.dto.request.OrderRequest;
 import com.ra.inventory_management.model.entity.*;
 import com.ra.inventory_management.reponsitory.*;
+import com.ra.inventory_management.sercurity.exception.ResourceNotFoundException;
 import com.ra.inventory_management.service.AuthService;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,6 +52,9 @@ public class OrderServiceIMPL implements OrderService {
 
     @Override
     public Orders save(OrderRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Users userPrincipal = (Users) authentication.getPrincipal();
+
         Orders order = new Orders();
         order.setOrderCode(Orders.generateOrderCode());
 
@@ -79,6 +85,7 @@ public class OrderServiceIMPL implements OrderService {
         order.setStatus(request.getStatus());
         order.setCreatedDate(LocalDateTime.now());
         order.setDeleteFg(true);
+        order.setCreatedBy(userPrincipal);
 
         // Tạo danh sách orderDetails
         List<OrderDetails> items = new ArrayList<>();
@@ -278,8 +285,8 @@ public class OrderServiceIMPL implements OrderService {
     }
 
     @Override
-    public Optional<Orders> findById(Long id) {
-        return orderRepository.findById(id);
+    public Orders findById(Long id) {
+        return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy order với id: " + id));
     }
 
     @Override
@@ -308,6 +315,6 @@ public class OrderServiceIMPL implements OrderService {
     @Override
     public List<Orders> findByIdList(List<Long> ids) {
         List<Orders> order = orderRepository.findAllById(ids);
-        return order;
+        return order.stream().sorted((o1, o2) -> o1.getStatus() - o2.getStatus()).toList();
     }
 }
