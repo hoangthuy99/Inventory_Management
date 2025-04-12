@@ -68,10 +68,6 @@ public class CategoryServiceIMPL implements CategoryService {
         categoryRepository.deleteById(id);
     }
 
-    @Override
-    public List<Categories> getbyActiveFlag() {
-        return categoryRepository.findByActiveFlag(1);
-    }
 
 
     @Override

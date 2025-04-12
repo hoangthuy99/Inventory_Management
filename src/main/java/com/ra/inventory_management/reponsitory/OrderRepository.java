@@ -22,7 +22,9 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     List<Orders> findAllActiveOrders(@Param("deleteFg") Boolean deleteFg);
 
     @Query("SELECT o FROM Orders o WHERE o.customer.id = :customerId AND o.status = :status")
-    List<Orders> findByCustomerIdAndStatus(Long customerId, Long orderId, Integer status);
+    List<Orders> findByCustomerIdAndStatus(@Param("customerId") Long customerId,
+                                           @Param("status") Integer status);
+
 
     @Query("SELECT o from Orders o WHERE o.orderCode like ?1% ")
     List<Orders> searchByOrderCode(String keyword);

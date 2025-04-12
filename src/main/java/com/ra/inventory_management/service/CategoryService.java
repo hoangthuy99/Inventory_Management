@@ -22,7 +22,6 @@ public interface CategoryService {
 
     void delete(Long id);
 
-    List<Categories> getbyActiveFlag();
 
     List<Categories> searchByName(String keyword);
 

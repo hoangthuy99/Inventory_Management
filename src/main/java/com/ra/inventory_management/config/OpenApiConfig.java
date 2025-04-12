@@ -18,7 +18,8 @@ public class OpenApiConfig {
     public GroupedOpenApi groupedOpenApi() {
         return GroupedOpenApi.builder()
                 .group("api-server-1")
-                .packagesToScan("com.ra.inventory_management.config")
+                .packagesToScan("com.ra.inventory_management.controller")
+                .pathsToMatch("/app/**")
                 .build();
     }
 }

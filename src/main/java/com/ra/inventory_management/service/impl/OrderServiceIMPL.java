@@ -317,7 +317,10 @@ public class OrderServiceIMPL implements OrderService {
 
     @Override
     public Orders getByIdAndStatus(Long customerId, Long orderId, Integer status) {
-        return (Orders) orderRepository.findByCustomerIdAndStatus(customerId, orderId, 1);
+        return (Orders) orderRepository.findByCustomerIdAndStatus(customerId, status).stream()
+                .filter(order -> order.getId().equals(orderId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + orderId));
     }
 
     @Override
