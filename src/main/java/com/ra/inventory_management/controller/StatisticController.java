@@ -21,8 +21,8 @@ import java.util.Map;
 public class StatisticController {
     @Autowired
     private StatisticService statisticService;
-
-    //    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @GetMapping("getTotalBussiness")
     public ResponseEntity<?> getTotalBussiness() {
         TotalBussinessResponse response = statisticService.getTotalBussiness();

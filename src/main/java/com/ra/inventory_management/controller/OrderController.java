@@ -53,10 +53,9 @@ public class OrderController {
     // Lấy đơn hàng theo ID
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @GetMapping("/{id}")
-    public ResponseEntity<Orders> getOrderById(@PathVariable Long id) {
-        Optional<Orders> order = orderService.findById(id);
-        return order.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
+        Orders order = orderService.findById(id);
+        return ResponseEntity.ok().body(order);
     }
 
     // Lấy đơn hàng theo danh sách id

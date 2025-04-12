@@ -18,7 +18,8 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     @Query("SELECT od.qty FROM OrderDetails od WHERE od.order.id = :orderId")
     List<Integer> findQtyByOrderId(@Param("orderId") Long orderId);
-    @Query("SELECT o FROM Orders o LEFT JOIN FETCH o.orderDetails WHERE o.deleteFg = :deleteFg")
+
+    @Query("SELECT o FROM Orders o LEFT JOIN FETCH o.orderDetails WHERE o.deleteFg = :deleteFg order by o.status asc ")
     List<Orders> findAllActiveOrders(@Param("deleteFg") Boolean deleteFg);
 
     @Query("SELECT o FROM Orders o WHERE o.customer.id = :customerId AND o.status = :status")
@@ -28,7 +29,6 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     @Query("SELECT o from Orders o WHERE o.orderCode like ?1% ")
     List<Orders> searchByOrderCode(String keyword);
-
 
 
     @Query("""

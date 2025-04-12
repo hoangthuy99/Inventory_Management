@@ -30,7 +30,7 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private Integer expiration;
 
-    public String generateToken(Users users){
+    public String generateToken(Users users) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", users.getEmail());
 
@@ -44,13 +44,13 @@ public class JwtTokenUtil {
                     .compact();
 
             return token;
-        }catch (Exception e){
+        } catch (Exception e) {
             // you can inject Logger, instead of System.out.println
             throw new InvalidParameterException("Can not create token, error: " + e.getMessage());
         }
     }
 
-    public Key getSignKey(){
+    public Key getSignKey() {
         byte[] bytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(bytes);
     }

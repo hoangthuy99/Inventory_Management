@@ -75,7 +75,7 @@ public class UserServiceIMPL implements UserService {
         }
 
         // Gán quyền mặc định
-        Set<Roles> defaultRoles = new HashSet<>();
+        List<Roles> defaultRoles = new ArrayList<>();
         defaultRoles.add(role);
         user.setRoles(defaultRoles);
 
@@ -99,7 +99,7 @@ public class UserServiceIMPL implements UserService {
 
     @Override
     public List<Users> getAll() {
-        return  userRepository.findAll();
+        return userRepository.findAll();
     }
 
     @Override
@@ -144,7 +144,7 @@ public class UserServiceIMPL implements UserService {
         Roles roles = roleRepository.findById(request.getRoleId()).
                 orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại vai trò với id: " + request.getRoleId()));
 
-        Set<Roles> rolesExits = userOld.getRoles();
+        List<Roles> rolesExits = userOld.getRoles();
         rolesExits.removeAll(userOld.getRoles());
         rolesExits.add(roles);
 

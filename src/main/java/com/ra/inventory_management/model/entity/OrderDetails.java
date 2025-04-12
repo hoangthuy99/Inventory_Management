@@ -36,6 +36,10 @@ public class OrderDetails {
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
+
+    @Column(name = "unit_price", nullable = false)
+    private BigDecimal unitPrice;
+
     @NotNull
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

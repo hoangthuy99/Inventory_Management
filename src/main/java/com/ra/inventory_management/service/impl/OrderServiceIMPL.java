@@ -5,10 +5,13 @@ import com.ra.inventory_management.model.dto.request.OrderDetailRequest;
 import com.ra.inventory_management.model.dto.request.OrderRequest;
 import com.ra.inventory_management.model.entity.*;
 import com.ra.inventory_management.reponsitory.*;
+import com.ra.inventory_management.sercurity.exception.ResourceNotFoundException;
 import com.ra.inventory_management.service.AuthService;
 import com.ra.inventory_management.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,6 +52,9 @@ public class OrderServiceIMPL implements OrderService {
 
     @Override
     public Orders save(OrderRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Users userPrincipal = (Users) authentication.getPrincipal();
+
         Orders order = new Orders();
         order.setOrderCode(Orders.generateOrderCode());
 
@@ -79,6 +85,7 @@ public class OrderServiceIMPL implements OrderService {
         order.setStatus(request.getStatus());
         order.setCreatedDate(LocalDateTime.now());
         order.setDeleteFg(true);
+        order.setCreatedBy(userPrincipal);
 
         // Tạo danh sách orderDetails
         List<OrderDetails> items = new ArrayList<>();
@@ -93,6 +100,7 @@ public class OrderServiceIMPL implements OrderService {
                     .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0) // Kiểm tra NULL
                     .productInfo(productInfo)
                     .productUnit(itemRequest.getProductUnit())
+                    .unitPrice(itemRequest.getUnitPrice())
                     .totalPrice(productInfo.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQty())))
                     .build();
 
@@ -129,9 +137,9 @@ public class OrderServiceIMPL implements OrderService {
         }
 
         if (orderRequest.getPlannedExportDate() != null) {
-            if (orderRequest.getPlannedExportDate().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Ngày xuất kho kế hoạch phải từ hôm nay trở đi.");
-            }
+//            if (orderRequest.getPlannedExportDate().isBefore(LocalDateTime.now())) {
+//                throw new RuntimeException("Ngày xuất kho kế hoạch phải từ hôm nay trở đi.");
+//            }
             order.setPlannedExportDate(orderRequest.getPlannedExportDate());
         }
 
@@ -202,6 +210,7 @@ public class OrderServiceIMPL implements OrderService {
                     orderDetails.setProductUnit(itemRequest.getProductUnit());
                     orderDetails.setDeleteFg(itemRequest.getDeleteFg());
                     orderDetails.setProductUnit(itemRequest.getProductUnit());
+                    orderDetails.setUnitPrice(itemRequest.getUnitPrice());
                     updatedItems.add(orderDetails);
                 } else {
                     OrderDetails newOrderDetails = OrderDetails.builder()
@@ -210,6 +219,7 @@ public class OrderServiceIMPL implements OrderService {
                             .qty(itemRequest.getQty() != null ? itemRequest.getQty() : 0)
                             .productInfo(productInfo)
                             .productUnit(itemRequest.getProductUnit())
+                            .unitPrice(itemRequest.getUnitPrice())
                             .totalPrice(productInfo.getPrice())
                             .build();
                     updatedItems.add(newOrderDetails);
@@ -217,42 +227,6 @@ public class OrderServiceIMPL implements OrderService {
             }
             order.setOrderDetails(updatedItems);
         }
-
-        // If status ís approved plus stock of product
-        // if (orderRequest.getStatus().equals(Constant.GDI_APPROVED)) {
-        //     for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
-        //         ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
-        //         OrderDetails orderDetailExist = orderDetailRepository.findById(items.getId())
-        //                 .orElse(new OrderDetails());
-
-        //         if (productInfo != null) {
-        //             Integer quantityUpdated = productInfo.getQty() - items.getQty();
-
-        //             if (items.getQty() > orderDetailExist.getQty()) {
-        //                 quantityUpdated = productInfo.getQty() - (items.getQty() - orderDetailExist.getQty());
-        //             } else if (items.getQty() < orderDetailExist.getQty()) {
-        //                 quantityUpdated = productInfo.getQty() + (orderDetailExist.getQty() - items.getQty());
-        //             }
-
-        //             productInfo.setQty(quantityUpdated);
-        //             productRepository.save(productInfo);
-        //         }
-        //     }
-        // }
-
-        // // If status is cancel plus stock of product
-        // if (orderRequest.getStatus().equals(Constant.GDI_CANCELED)) {
-        //     for (OrderDetailRequest items : orderRequest.getOrderDetailsRequest()) {
-        //         ProductInfo productInfo = productRepository.findById(items.getProductId()).orElse(new ProductInfo());
-
-        //         if (productInfo != null) {
-        //             Integer quantityUpdated = productInfo.getQty() + items.getQty();
-
-        //             productInfo.setQty(quantityUpdated);
-        //             productRepository.save(productInfo);
-        //         }
-        //     }
-        // }
 
         return orderRepository.save(order);
     }
@@ -311,8 +285,8 @@ public class OrderServiceIMPL implements OrderService {
     }
 
     @Override
-    public Optional<Orders> findById(Long id) {
-        return orderRepository.findById(id);
+    public Orders findById(Long id) {
+        return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy order với id: " + id));
     }
 
     @Override
@@ -344,6 +318,6 @@ public class OrderServiceIMPL implements OrderService {
     @Override
     public List<Orders> findByIdList(List<Long> ids) {
         List<Orders> order = orderRepository.findAllById(ids);
-        return order;
+        return order.stream().sorted((o1, o2) -> o1.getStatus() - o2.getStatus()).toList();
     }
 }

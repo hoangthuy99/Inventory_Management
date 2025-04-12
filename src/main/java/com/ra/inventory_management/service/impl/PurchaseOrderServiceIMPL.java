@@ -48,7 +48,7 @@ public class PurchaseOrderServiceIMPL implements PurchaseOrderService {
                 .orElseThrow(() -> new RuntimeException("Supplier not found by id: " + request.getSupplierId()));
 
         // Get supplier by id if not found throw error
-        Branch branch = branchRepository.findById(request.getSupplierId().longValue())
+        Branch branch = branchRepository.findById(request.getBranchId().longValue())
                 .orElseThrow(() -> new RuntimeException("Branch not found by id: " + request.getBranchId()));
 
         // Create instant for purchase order

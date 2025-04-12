@@ -31,7 +31,6 @@ public class AuthServiceIMPL implements AuthService {
     private final RoleRepository roleRepository;
 
 
-
     @Override
     public JwtResponse login(String username, String password) {
         Optional<Users> userOptional = userRepository.findByUsername(username);
@@ -112,6 +111,7 @@ public class AuthServiceIMPL implements AuthService {
 
         return JwtResponse.builder()
                 .email(userGoogleExisted.getEmail())
+                .code(userGoogleExisted.getCode())
                 .username(userGoogleExisted.getUsername())
                 .fullName(userGoogleExisted.getUsername())
                 .roles(List.of("ROLE_STAFF"))
@@ -119,6 +119,6 @@ public class AuthServiceIMPL implements AuthService {
     }
 
 
-    }
+}
 
 
