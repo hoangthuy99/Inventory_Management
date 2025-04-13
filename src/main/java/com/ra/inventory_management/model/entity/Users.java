@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -82,7 +83,10 @@ public class Users implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(r -> new SimpleGrantedAuthority(r.getRoleName().name())).toList();
+                .flatMap(role -> role.getMenus().stream())
+                .map(m -> new SimpleGrantedAuthority(m.getCode()))
+                .collect(Collectors.toList());
+
     }
 
     @Override

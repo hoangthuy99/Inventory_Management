@@ -26,7 +26,7 @@ public class OrderController {
 
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_ORDERS')")
     public ResponseEntity<List<Orders>> getAll(@RequestParam(required = false) Long customerId) {
         if (customerId != null) {
             return ResponseEntity.ok(orderService.getAllByCus(customerId));
@@ -34,7 +34,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAll());
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_ORDER')")
     @PostMapping("/createOrder")
     public ResponseEntity<?> saveOrder(@RequestBody OrderRequest orderRequest) {
         System.out.println("Dữ liệu nhận được: " + orderRequest);
@@ -42,7 +42,7 @@ public class OrderController {
         return ResponseEntity.ok().body(new BaseResponse<>(savedOrder));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('EDIT_ORDER')")
     @PutMapping("/updateOrder")
     public ResponseEntity<?> updateOrder(@RequestBody OrderRequest request) {
         Orders order = orderService.update(request);
@@ -51,13 +51,14 @@ public class OrderController {
 
 
     // Lấy đơn hàng theo ID
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_ORDER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         Orders order = orderService.findById(id);
         return ResponseEntity.ok().body(order);
     }
 
+    @PreAuthorize("hasAuthority('ALL_ORDERS')")
     // Lấy đơn hàng theo danh sách id
     @GetMapping("getByIdList")
     public ResponseEntity<?> getOrderByIdList(@RequestParam("ids") List<Long> ids) {
@@ -66,7 +67,7 @@ public class OrderController {
     }
 
     // Tìm đơn hàng theo ID khách hàng và trạng thái
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_ORDER')")
     @GetMapping("/{customerId}/{orderId}/{status}")
     public ResponseEntity<Orders> getByIdAndStatus(
             @PathVariable Long customerId,
@@ -77,7 +78,7 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/status")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('EDIT_ORDER')")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, Integer> requestBody) {
         try {
             Integer newStatus = requestBody.get("newStatus");
@@ -96,22 +97,22 @@ public class OrderController {
 
     // Tìm đơn hàng theo mã đơn hàng
     @GetMapping("/search")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_ORDERS')")
     public ResponseEntity<List<Orders>> searchByOrderCode(@RequestParam String keyword) {
         return ResponseEntity.ok(orderService.searchByOrderCode(keyword));
     }
 
     @PutMapping("/restore/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_ORDER')")
     public ResponseEntity<?> restoreOrder(@PathVariable Long id) {
         orderService.findByDeleteFg(true);
         return ResponseEntity.ok("Đơn hàng đã khôi phục thành công!");
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('EDIT_ORDER')")
     @PutMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         orderService.deleteOr(id);
-        return ResponseEntity.ok("Đơn hàng đã khôi phục thành công!");
+        return ResponseEntity.ok("Đơn hàng đã được xóa thành công!");
     }
 }

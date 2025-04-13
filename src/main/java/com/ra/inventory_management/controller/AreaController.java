@@ -18,21 +18,21 @@ public class AreaController {
     @Autowired
     private AreaService areaService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('MAP')")
     @GetMapping("list")
     public ResponseEntity<?> getAllAreas() {
         List<Area> areas = areaService.getAll();
         return ResponseEntity.ok().body(new BaseResponse<>(areas));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('MAP')")
     @GetMapping("getByBranch/{branchId}")
     public ResponseEntity<?> getByBranch(@PathVariable int branchId) {
         List<Area> areas = areaService.getByBranchId(branchId);
         return ResponseEntity.ok().body(new BaseResponse<>(areas));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('MAP')")
     @PostMapping("createOrUpdate/{branchId}")
     public ResponseEntity<?> createOrUpdate(@PathVariable Long branchId,
                                             @RequestBody List<AreaRequest> requests) {
@@ -40,7 +40,7 @@ public class AreaController {
         return ResponseEntity.ok().body(new BaseResponse<>(areas));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('MAP')")
     @DeleteMapping("delete")
     public ResponseEntity<?> delete(@RequestParam List<Integer> ids) {
         Boolean deleted = areaService.deleteMulti(ids);

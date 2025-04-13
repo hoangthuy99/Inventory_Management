@@ -89,6 +89,10 @@ public class AuthServiceIMPL implements AuthService {
 
     @Override
     public JwtResponse oauthLogin(Map<String, Object> claims) {
+        Roles role = roleRepository.findAll().stream()
+                .filter(r -> r.getRoleName().equals(ERoles.ROLE_SHIPPER))
+                .findFirst().orElse(new Roles());
+
         UserGoogle userGoogleExisted = userGoogleRepository.findByEmail(claims.get("email").toString()).orElse(null);
 
         // if not exist save to database
@@ -105,16 +109,25 @@ public class AuthServiceIMPL implements AuthService {
                     .avatar(claims.get("picture").toString())
                     .createdAt(LocalDateTime.now())
                     .deleteFg(false)
+                    .role(role)
                     .build();
             userGoogleExisted = userGoogleRepository.save(userGoogle);
         }
+
+        String accessToken = jwtTokenUtil.generateToken(
+                Users.builder()
+                        .username(userGoogleExisted.getUsername())
+                        .email(userGoogleExisted.getEmail())
+                        .build()
+        );
 
         return JwtResponse.builder()
                 .email(userGoogleExisted.getEmail())
                 .code(userGoogleExisted.getCode())
                 .username(userGoogleExisted.getUsername())
                 .fullName(userGoogleExisted.getUsername())
-                .roles(List.of("ROLE_STAFF"))
+                .roles(List.of(ERoles.ROLE_SHIPPER.name()))
+                .accessToken(accessToken)
                 .build();
     }
 

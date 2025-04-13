@@ -31,14 +31,14 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_CATEGORY')")
     @GetMapping
     public ResponseEntity<List<Categories>> getCategories() {
         List<Categories> categoryList = categoryService.getAll();
         return ResponseEntity.ok(categoryList);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_CATEGORY')")
     @PostMapping("searchCategories")
     public ResponseEntity<?> searchCategories(
             @RequestBody SearchRequest request
@@ -47,7 +47,7 @@ public class CategoryController {
         return ResponseEntity.ok().body(new BaseResponse<>(categories));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADD_CATEGORY')")
     @PostMapping(value = "/add-category", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         try {
@@ -77,7 +77,7 @@ public class CategoryController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('EDIT_CATEGORY')")
     @PutMapping("/{id}/activeFlag")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, Integer> requestBody) {
         Categories category = categoryService.findById(id);
@@ -96,7 +96,7 @@ public class CategoryController {
     }
 
     // API lấy danh mục theo ID
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_CATEGORY')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
         Categories category = categoryService.findById(id);
@@ -107,7 +107,7 @@ public class CategoryController {
     }
 
     //  API cập nhật danh mục
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('EDIT_CATEGORY')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest) {
         if (categoryRequest == null) {
@@ -129,7 +129,7 @@ public class CategoryController {
     }
 
     //  API xóa danh mục
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('EDIT_CATEGORY')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         Optional<Categories> category = Optional.ofNullable(categoryService.findById(id));
@@ -143,7 +143,7 @@ public class CategoryController {
     }
 
     // API import file excel
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_CATEGORY')")
     @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> importExcel(
             @RequestParam("file") MultipartFile file
@@ -155,7 +155,7 @@ public class CategoryController {
 
 
     @GetMapping("sampleExcel")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_CATEGORY')")
     public ResponseEntity<?> getSampleExcel() throws IOException {
         Map<String, String> response = categoryService.getSampleExcel();
         return ResponseEntity.ok().body(new BaseResponse<>(response));
