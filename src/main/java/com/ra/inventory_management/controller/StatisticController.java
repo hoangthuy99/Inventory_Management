@@ -21,8 +21,8 @@ import java.util.Map;
 public class StatisticController {
     @Autowired
     private StatisticService statisticService;
-    
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+
+    @PreAuthorize("hasAuthority('DASHBOARD')")
     @GetMapping("getTotalBussiness")
     public ResponseEntity<?> getTotalBussiness() {
         TotalBussinessResponse response = statisticService.getTotalBussiness();
@@ -30,7 +30,7 @@ public class StatisticController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('DASHBOARD')")
     @GetMapping("getTotalOrderStatus")
     public ResponseEntity<?> getTotalOrderStatus() {
         TotalOrderStatusResponse response = statisticService.getTotalOrderStatus();
@@ -38,7 +38,7 @@ public class StatisticController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('DASHBOARD')")
     @GetMapping("getTotalRevenue/{filterType}")
     public ResponseEntity<?> getTotalRevenue(@PathVariable Integer filterType) {
         List<TotalRevenueResponse> response = statisticService.getTotalRevenue(filterType);

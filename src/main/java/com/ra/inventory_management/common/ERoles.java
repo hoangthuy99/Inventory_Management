@@ -7,5 +7,5 @@ public enum ERoles {
     ROLE_STORE_MANAGER,
     ROLE_STAFF,
     ROLE_ACCOUNTANT,
-    ROLE_SUPPLIER;
+    ROLE_SHIPPER;
 }

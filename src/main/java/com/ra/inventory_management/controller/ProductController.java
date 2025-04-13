@@ -46,7 +46,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_PRODUCT')")
     @GetMapping("/{id}")
     public ResponseEntity<ProductInfo> getProductById(@PathVariable Long id) {
         ProductInfo product = productService.findById(id);
@@ -56,7 +56,7 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_PRODUCT')")
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> products = productService.getAll()
@@ -66,7 +66,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PRODUCT')")
     @GetMapping("/uploads/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) throws MalformedURLException {
         Path file = Paths.get("uploads").resolve(filename);
@@ -74,7 +74,7 @@ public class ProductController {
         return ResponseEntity.ok().body(resource);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PRODUCT')")
     @PostMapping(
             value = "add-product",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -113,7 +113,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('EDIT_PRODUCT')")
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
@@ -146,7 +146,7 @@ public class ProductController {
     }
 
     //  API xóa sản phẩm
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PRODUCT')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.delete(id);
@@ -155,7 +155,7 @@ public class ProductController {
 
     //  API lấy sản phẩm theo danh mục
     @GetMapping("/category/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_PRODUCT')")
     public ResponseEntity<Page<ProductInfo>> getProductsByCategory(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
@@ -167,7 +167,7 @@ public class ProductController {
     }
 
     // API import file excel
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PRODUCT')")
     @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> importExcel(
             @RequestParam("file") MultipartFile file
@@ -177,7 +177,7 @@ public class ProductController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_PRODUCT')")
     @GetMapping("sampleExcel")
     public ResponseEntity<?> getSampleExcel() throws IOException {
         Map<String, String> response = productService.getSampleExcel();

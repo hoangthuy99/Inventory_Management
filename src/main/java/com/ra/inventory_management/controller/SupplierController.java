@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,12 +31,14 @@ public class SupplierController {
     @Autowired
     private SupplierService supplierService;
 
+    @PreAuthorize("hasAuthority('ALL_SUPPLIER')")
     @GetMapping("getAllSuppliers")
     public ResponseEntity<?> getAllSuppliers() {
         List<Supplier> suppliers = supplierRepository.findAll();
         return ResponseEntity.ok().body(new BaseResponse<>(suppliers));
     }
 
+    @PreAuthorize("hasAuthority('ALL_SUPPLIER')")
     @PostMapping("searchSupplier")
     public ResponseEntity<?> searchSuppliers(
             @RequestBody SearchRequest request
@@ -44,6 +47,7 @@ public class SupplierController {
         return ResponseEntity.ok().body(new BaseResponse<>(Suppliers));
     }
 
+    @PreAuthorize("hasAuthority('ADD_SUPPLIER')")
     @PostMapping(value = "/add-supplier", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addsupplier(@Valid @RequestBody SupplierRequest supplierRequest) {
         try {
@@ -75,6 +79,7 @@ public class SupplierController {
 
 
     // API lấy danh mục theo ID
+    @PreAuthorize("hasAuthority('ADD_SUPPLIER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getSupplierById(@PathVariable Integer id) {
         Optional<Supplier> supplier = supplierService.findById(id);
@@ -85,6 +90,7 @@ public class SupplierController {
     }
 
     //  API cập nhật danh mục
+    @PreAuthorize("hasAuthority('EDIT_SUPPLIER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateSupplier(@PathVariable Integer id, @RequestBody SupplierRequest supplierRequest) {
         if (supplierRequest == null) {
@@ -108,6 +114,7 @@ public class SupplierController {
     }
 
     //  API xóa danh mục
+    @PreAuthorize("hasAuthority('EDIT_SUPPLIER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         Optional<Supplier> supplier = supplierService.findById(id);
@@ -121,12 +128,14 @@ public class SupplierController {
     }
 
     // API import file excel
+    @PreAuthorize("hasAuthority('ADD_SUPPLIER')")
     @PostMapping(value = "importExcel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> importExcel(@RequestParam("file") MultipartFile file) throws IOException {
         List<Supplier> response = supplierService.importExcel(file);
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
+    @PreAuthorize("hasAuthority('ALL_SUPPLIER')")
     @GetMapping("sampleExcel")
     public ResponseEntity<?> getSampleExcel() throws IOException {
         Map<String, String> response = supplierService.getSampleExcel();

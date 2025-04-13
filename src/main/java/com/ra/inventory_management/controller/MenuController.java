@@ -20,7 +20,7 @@ public class MenuController {
 
     public final MenuService menuService;
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('EDIT_MENU')")
     @GetMapping("/{id}")
     public ResponseEntity<Menu> getMenuById(@PathVariable Long id) {
         Optional<Menu> menu = menuService.getByIdMenu(id);
@@ -28,6 +28,7 @@ public class MenuController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAuthority('ALL_MENU')")
     @GetMapping
     public ResponseEntity<List<Menu>> getAllMenus() {
         return ResponseEntity.ok(menuService.getAll());
@@ -39,27 +40,26 @@ public class MenuController {
 //    }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('EDIT_MENU')")
     @PutMapping("/{id}")
     public ResponseEntity<Menu> updateMenu(@RequestBody MenuRequest request, @PathVariable Long id) {
         return ResponseEntity.ok(menuService.update(request, id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('EDIT_MENU')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long id) {
         menuService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ALL_MENU')")
     @PostMapping("/search")
     public ResponseEntity<Page<Menu>> searchMenus(@RequestBody SearchRequest request) {
         Page<Menu> menus = menuService.search(request);
         return ResponseEntity.ok(menus);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @GetMapping("getMenuByUser")
     public ResponseEntity<List<Menu>> getMenuByUser() {
         List<Menu> menus = menuService.getMenuByUser();

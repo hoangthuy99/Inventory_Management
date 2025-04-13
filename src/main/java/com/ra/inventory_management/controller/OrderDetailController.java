@@ -19,7 +19,7 @@ public class OrderDetailController {
     private OrderDetailService orderDetailService;
 
     // Lấy danh sách OrderDetails theo productId
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_ORDERS')")
     @GetMapping("/{productId}")
     public ResponseEntity<List<OrderDetails>> getOrderDetailsByProductId(@PathVariable Long productId) {
         List<OrderDetails> orderDetails = orderDetailService.getAll(productId);
@@ -27,7 +27,7 @@ public class OrderDetailController {
     }
 
     // Tìm OrderDetails theo tên sản phẩm
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_ORDERS')")
     @GetMapping("/search")
     public ResponseEntity<List<OrderDetails>> searchByProductName(@RequestParam String keyword) {
         List<OrderDetails> results = orderDetailService.searchByProductName(keyword);
@@ -35,7 +35,7 @@ public class OrderDetailController {
     }
 
     // Thêm mới OrderDetails
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_ORDER')")
     @PostMapping
     public ResponseEntity<OrderDetails> createOrderDetail(@RequestBody OrderDetails orderDetails) {
         OrderDetails savedOrderDetail = orderDetailService.save(orderDetails);
@@ -43,7 +43,7 @@ public class OrderDetailController {
     }
 
     // Xóa OrderDetails theo ID
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_ORDER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOrderDetail(@PathVariable Long id) {
         orderDetailService.delete(id);

@@ -61,8 +61,6 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
 
-
-
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         JwtResponse response = authService.login(request.getUsername(), request.getPassword());
@@ -101,7 +99,6 @@ public class AuthController {
     public ResponseEntity<?> oauthLogin(JwtAuthenticationToken token, HttpServletRequest request) {
         Map<String, Object> claims = token.getTokenAttributes();
         JwtResponse response = authService.oauthLogin(claims);
-        response.setAccessToken(request.getHeader("Authorization").replace("Bearer ", ""));
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
@@ -111,7 +108,6 @@ public class AuthController {
         UserGoogle response = authService.registerOAuth(claims);
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
-
 
 
 }

@@ -2,7 +2,6 @@ package com.ra.inventory_management.controller;
 
 import com.ra.inventory_management.model.dto.response.BaseResponse;
 import com.ra.inventory_management.model.entity.Branch;
-import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.service.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,20 +33,20 @@ public class BranchController {
     @Autowired
     private BranchService branchService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_BRANCH')")
     @GetMapping
     public ResponseEntity<List<Branch>> getAllBranches() {
         return ResponseEntity.ok(branchService.getAll());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_BRANCH')")
     @GetMapping("/{id}")
     public ResponseEntity<Branch> getBranchById(@PathVariable Long id) {
         Optional<Branch> branch = branchService.findById(id);
         return branch.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADD_BRANCH')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createBranch(@ModelAttribute Branch branch,
                                           @RequestParam(value = "img", required = false) MultipartFile image
@@ -68,24 +67,25 @@ public class BranchController {
                     Files.createDirectories(uploadPath);
                 }
                 Files.copy(image.getInputStream(), uploadPath.resolve(image.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+
+                String imagePath = "uploads/branch/" + image.getOriginalFilename();
+                // Gọi service để lưu sản phẩm
+                branch.setMapImage(imagePath);
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi lưu ảnh!");
             }
         }
 
-        String imagePath = "uploads/branch/" + image.getOriginalFilename();
-        // Gọi service để lưu sản phẩm
-        branch.setMapImage(imagePath);
-
         return ResponseEntity.ok(branchService.save(branch));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('EDIT_BRANCH')")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateBranch(@PathVariable Long id, @ModelAttribute Branch branchDetails,
                                           @RequestParam(value = "img", required = false) MultipartFile image
     ) {
         Optional<Branch> existingBranch = branchService.findById(id);
+
         if (existingBranch.isPresent()) {
             // Kiểm tra xem có upload file không
             if (image != null && !image.isEmpty()) {
@@ -103,37 +103,36 @@ public class BranchController {
                         Files.createDirectories(uploadPath);
                     }
                     Files.copy(image.getInputStream(), uploadPath.resolve(image.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+
+                    // Set value branch detail
+                    branchDetails.setMapImage("uploads/branch/" + image.getOriginalFilename());
+                    branchDetails.setId(id);
                 } catch (IOException e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi lưu ảnh!");
                 }
+
             }
 
-            String imagePath = "uploads/branch/" + image.getOriginalFilename();
-            // Gọi service để lưu sản phẩm
-            branchDetails.setMapImage(imagePath);
-
-
-            branchDetails.setId(id);
             return ResponseEntity.ok(branchService.save(branchDetails));
         }
         return ResponseEntity.notFound().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('EDIT_BRANCH')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBranch(@PathVariable Long id) {
         branchService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_BRANCH')")
     @GetMapping("/search")
     public ResponseEntity<List<Branch>> searchBranches(@RequestParam String keyword) {
         return ResponseEntity.ok(branchService.searchByName(keyword));
     }
 
     // API import file excel
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADD_BRANCH')")
     @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> importExcel(
             @RequestParam("file") MultipartFile file
@@ -143,7 +142,7 @@ public class BranchController {
         return ResponseEntity.ok().body(new BaseResponse<>(response));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ALL_BRANCH')")
     @GetMapping("sampleExcel")
     public ResponseEntity<?> getSampleExcel() throws IOException {
         Map<String, String> response = branchService.getSampleExcel();

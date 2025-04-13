@@ -54,13 +54,6 @@ public class WebSecurityConfig {
     @Lazy
     private JwtTokenFilter jwtTokenFilter;
 
-    private final List<String> permitEndpoints = List.of(
-            "/app/auth/**",
-            "/app/category/**",
-            "/app/product/**",
-            "/uploads/**"
-    );
-
     @Bean
     @Order(1)
     public SecurityFilterChain jwtSecurityFilter(HttpSecurity http) throws Exception {
@@ -73,7 +66,6 @@ public class WebSecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/app/auth/**", "/uploads/**").permitAll()
-                        .requestMatchers("/app/menu/getMenuByUser").hasAnyRole("ADMIN", "STAFF")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

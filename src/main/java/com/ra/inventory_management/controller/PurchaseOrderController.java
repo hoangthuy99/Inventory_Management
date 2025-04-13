@@ -19,22 +19,21 @@ public class PurchaseOrderController {
     @Autowired
     private PurchaseOrderService purchaseOrderService;
 
-
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PURCHASE')")
     @PostMapping("createPurchaseOrder")
     public ResponseEntity<?> createPurchaseOrder(@RequestBody PurchaseOrderRequest request) {
         PurchaseOrder purchaseOrder = purchaseOrderService.createPurchaseOrder(request);
         return ResponseEntity.ok().body(new BaseResponse<>(purchaseOrder));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PURCHASE')")
     @PutMapping("updatePurchaseOrder")
     public ResponseEntity<?> updatePurchaseOrder(@RequestBody PurchaseOrderRequest request) {
         PurchaseOrder purchaseOrder = purchaseOrderService.updatePurchaseOrder(request);
         return ResponseEntity.ok().body(new BaseResponse<>(purchaseOrder));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ALL_PURCHASE')")
     @PostMapping("searchPurchaseOrder")
     public ResponseEntity<?> searchPurchaseOrder(
             @RequestBody SearchRequest request
@@ -43,14 +42,14 @@ public class PurchaseOrderController {
         return ResponseEntity.ok().body(new BaseResponse<>(purchaseOrders));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PURCHASE')")
     @DeleteMapping("deleteById/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Integer id) {
         purchaseOrderService.deletePurchase(id);
         return ResponseEntity.ok().body(new BaseResponse<>(null));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasAuthority('ADD_PURCHASE')")
     @GetMapping("getById/{id}")
     public ResponseEntity<?> getById(@PathVariable Integer id) {
         PurchaseOrder order = purchaseOrderService.getById(id);
