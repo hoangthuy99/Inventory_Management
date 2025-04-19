@@ -83,33 +83,29 @@ public class ProductController {
             @Valid @ModelAttribute ProductRequest productRequest,
             @RequestParam(value = "img", required = false) MultipartFile image) {
 
+        String imagePath = null;
 
-        // Kiểm tra xem có upload file không
         if (image != null && !image.isEmpty()) {
             try {
-                // Đọc ảnh từ input stream
                 BufferedImage originalImage = ImageIO.read(image.getInputStream());
                 if (originalImage == null) {
                     return ResponseEntity.badRequest().body("Tệp tải lên không hợp lệ hoặc bị lỗi!");
                 }
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-                // Lưu file vào thư mục "uploads"
                 Path uploadPath = Paths.get(uploadDir);
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                 }
                 Files.copy(image.getInputStream(), uploadPath.resolve(image.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+
+                imagePath = "uploads/" + image.getOriginalFilename();
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi lưu ảnh!");
             }
         }
 
-
-        String imagePath = "uploads/" + image.getOriginalFilename();
-        // Gọi service để lưu sản phẩm
-        ProductInfo product = productService.save(productRequest, imagePath);
-
+        //  Truyền null ID khi tạo mới
+        ProductInfo product = productService.save(productRequest, imagePath, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
@@ -125,7 +121,8 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm");
         }
 
-        String imagePath = existingProduct.getImg(); // Giữ nguyên ảnh cũ nếu không upload mới
+        String imagePath = existingProduct.getImg();
+
         if (image != null && !image.isEmpty()) {
             try {
                 Path uploadPath = Paths.get(uploadDir);
@@ -139,9 +136,8 @@ public class ProductController {
             }
         }
 
-        // Cập nhật thông tin sản phẩm
-        productService.save(productRequest, imagePath);
-
+        //  Truyền id để cập nhật
+        productService.save(productRequest, imagePath, id);
         return ResponseEntity.ok("Cập nhật sản phẩm thành công");
     }
 

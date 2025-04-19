@@ -33,10 +33,11 @@ public class MenuController {
         return ResponseEntity.ok(menuService.getAll());
     }
 
-//    @PostMapping
-//    public ResponseEntity<Menu> createMenu(@RequestBody MenuRequest menu) {
-//        return ResponseEntity.ok(menuService.create(menu));
-//    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<Menu> createMenu(@RequestBody MenuRequest menu) {
+        return ResponseEntity.ok(menuService.create(menu));
+    }
 
 
     @PreAuthorize("hasRole('ADMIN')")

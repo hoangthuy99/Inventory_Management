@@ -50,28 +50,32 @@ public class MenuServiceIMPL implements MenuService {
         menuRepository.deleteById(id);
     }
 
-//    @Override
-//    public Menu create(MenuRequest request) {
-//        if (menuRepository.existsByName(request.getName())) {
-//            throw new RuntimeException("Tên quyền đã tồn tại");
-//        }
-//        Menu menu = new Menu();
-//        Roles roles = roleRepository.findById(request.getRoleId()).
-//                orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại vai trò với id: " + request.getRoleId()));
-//
-//        Set<Roles> rolesExits = menu.getRoles();
-//        rolesExits.removeAll(menu.getRoles());
-//        rolesExits.add(roles);
-//        menu.setCode(request.getCode());
-//        menu.setName(request.getName());
-//        menu.setPath(request.getPath());
-//        menu.setIcon(request.getIcon());
-//        menu.setParentId(request.getParentId());
-//        menu.setActiveFlag(request.getActiveFlag());
-//        menu.setRoles(rolesExits);
-//
-//        return menuRepository.save(menu);
-//    }
+
+
+   @Override
+   public Menu create(MenuRequest request) {
+       if (menuRepository.existsByName(request.getName())) {
+           throw new RuntimeException("Tên quyền đã tồn tại");
+       }
+
+       Menu menu = new Menu();
+       // Fetch roles based on the list of role IDs
+       Set<Roles> roles = request.getRoleIds().stream()
+               .map(roleId -> roleRepository.findById(roleId)
+                       .orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại với id: " + roleId)))
+               .collect(Collectors.toSet());
+
+       // Set menu properties
+       menu.setCode(request.getCode());
+       menu.setName(request.getName());
+       menu.setPath(request.getPath());
+       menu.setIcon(request.getIcon());
+       menu.setParentId(request.getParentId());
+       menu.setActiveFlag(request.getActiveFlag());
+       menu.setRoles(roles); // Assign roles to the menu
+
+       return menuRepository.save(menu);
+   }
 
     @Override
     public Menu update(MenuRequest request, Long id) {

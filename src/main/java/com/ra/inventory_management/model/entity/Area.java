@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Getter
 @Setter
@@ -13,6 +16,7 @@ import lombok.Setter;
 public class Area {
     @Id
     @Column(name = "id", nullable = false)
+    @org.springframework.data.annotation.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -26,7 +30,7 @@ public class Area {
 
     @Size(max = 100)
     @NotNull
-    @Column(name = "name", nullable = false, length = 100)
+    @Field(type = FieldType.Text)
     private String name;
 
     @Column(name = "posX")
@@ -38,6 +42,8 @@ public class Area {
     @Column(name = "capacity")
     private Integer capacity;
 
+    @Column(name = "branch_id", insertable = false, updatable = false)
+    private Integer branchId;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "branch_id")
     private Branch branch;

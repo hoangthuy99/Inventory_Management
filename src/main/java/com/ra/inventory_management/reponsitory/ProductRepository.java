@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductInfo, Long> {
@@ -47,4 +48,5 @@ public interface ProductRepository extends JpaRepository<ProductInfo, Long> {
             """)
     List<Integer> getLowStockProducts(@Param("orderStatus") List<Integer> orderStatus);
 
+    Optional<ProductInfo> findByName(String name);
 }

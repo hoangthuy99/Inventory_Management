@@ -62,10 +62,19 @@ public class ProductServiceIMPL implements ProductService {
     }
 
     @Override
-    public ProductInfo save(ProductRequest productRequest, String imagePath) {
+    public ProductInfo save(ProductRequest productRequest, String imagePath, Long id) {
         try {
-            if (productRepository.existsByName(productRequest.getName())) {
-                throw new IllegalArgumentException("Tên sản phẩm đã tồn tại, vui lòng nhập tên sản phẩm khác!");
+            if (id == null) {
+                // Tạo mới: kiểm tra tên tồn tại
+                if (productRepository.existsByName(productRequest.getName())) {
+                    throw new IllegalArgumentException("Tên sản phẩm đã tồn tại, vui lòng nhập tên sản phẩm khác!");
+                }
+            } else {
+                // Cập nhật: kiểm tra trùng tên với sản phẩm khác
+                Optional<ProductInfo> existingByName = productRepository.findByName(productRequest.getName());
+                if (existingByName.isPresent() && !existingByName.get().getId().equals(id)) {
+                    throw new IllegalArgumentException("Tên sản phẩm đã tồn tại, vui lòng nhập tên sản phẩm khác!");
+                }
             }
 
             if (productRequest.getCategoryId() == null) {
@@ -75,10 +84,17 @@ public class ProductServiceIMPL implements ProductService {
             Categories category = categoryRepository.findById(productRequest.getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("ID danh mục không hợp lệ"));
 
-            ProductInfo product = new ProductInfo();
+            ProductInfo product;
+            if (id == null) {
+                product = new ProductInfo();
+                String generatedCode = ProductInfo.generateOrderCode();
+                product.setCode(generatedCode);
+            } else {
+                product = productRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm để cập nhật"));
+            }
+
             product.setName(productRequest.getName());
-            String generatedCode = ProductInfo.generateOrderCode();
-            product.setCode(generatedCode);
             product.setQty(productRequest.getQty());
             product.setPrice(BigDecimal.valueOf(productRequest.getPrice()));
             product.setDescription(productRequest.getDescription());
@@ -86,12 +102,13 @@ public class ProductServiceIMPL implements ProductService {
             product.setCategories(category);
             product.setImg(imagePath);
 
-            return productRepository.save(product); // Lưu vào cơ sở dữ liệu
+            return productRepository.save(product);
+
         } catch (IllegalArgumentException e) {
-            logger.error("Validation error: ", e); // Log lỗi chi tiết
+            logger.error("Validation error: ", e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Lỗi khi lưu sản phẩm", e); // Log lỗi chi tiết
+            logger.error("Lỗi khi lưu sản phẩm", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi hệ thống, vui lòng thử lại!", e);
         }
     }

@@ -14,9 +14,10 @@ import java.util.Map;
 public interface ProductService {
     List<ProductInfo> getAll();
 
-    ProductInfo save(ProductRequest productRequest, String imagePath);
+    ProductInfo save(ProductRequest productRequest, String imagePath,Long id);
 
     ProductInfo findById(Long id);
+
 
     void delete(Long id);
 
