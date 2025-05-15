@@ -1,17 +1,21 @@
 package com.ra.inventory_management.controller;
 
 
+import com.ra.inventory_management.model.dto.request.CustomerRequest;
 import com.ra.inventory_management.model.dto.response.BaseResponse;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.Customer;
 import com.ra.inventory_management.service.CustomerService;
+import com.ra.inventory_management.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +26,8 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private EmailService emailService;
 
     // Lấy danh sách tất cả khách hàng
     @GetMapping
@@ -38,23 +44,56 @@ public class CustomerController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Thêm mới khách hàng
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        Customer savedCustomer = customerService.save(customer);
-        return ResponseEntity.ok(savedCustomer);
+    public ResponseEntity<?> createCustomer(@RequestBody Customer customer) {
+        try {
+            // Sinh mã khách hàng
+            String generatedCode = Customer.generateOrderCode();
+            customer.setCusCode(generatedCode);
+            customer.setActiveFlag(1); // Đặt cờ hoạt động mặc định là 1
+            Customer newCustomer = customerService.save(customer);
+            // Gửi email chào mừng
+            String subject = "Chào mừng bạn đến với hệ thống!";
+            String message = "Xin chào " + newCustomer.getName() + ",\n\n" +
+                    "Cảm ơn bạn đã đăng ký với chúng tôi.\n" +
+                    "Mã khách hàng của bạn là: " + generatedCode;
+
+            emailService.sendEmail(newCustomer.getEmail(), subject, message);
+
+            return ResponseEntity.ok(newCustomer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Không thể tạo khách hàng: " + e.getMessage()));
+        }
     }
 
-    // Cập nhật thông tin khách hàng
+    // Cập nhật thông tin khách hàng + gửi email
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
         Optional<Customer> existingCustomer = customerService.findById(id);
-        if (existingCustomer.isPresent()) {
-            customer.setId(id); // Đảm bảo ID không bị thay đổi
-            Customer updatedCustomer = customerService.save(customer);
-            return ResponseEntity.ok(updatedCustomer);
+        if (existingCustomer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy khách hàng");
         }
-        return ResponseEntity.notFound().build();
+
+        try {
+            customer.setId(id); // Đảm bảo không đổi ID
+            Customer updatedCustomer = customerService.save(customer);
+
+            // Gửi email thông báo cập nhật
+            String subject = "Cập nhật thông tin khách hàng";
+            String message = "Xin chào " + updatedCustomer.getName() + ",\n\n" +
+                    "Thông tin của bạn đã được cập nhật thành công:\n" +
+                    "Tên: " + updatedCustomer.getName() + "\n" +
+                    "Email: " + updatedCustomer.getEmail() + "\n" +
+                    "SĐT: " + updatedCustomer.getPhone();
+
+            emailService.sendEmail(updatedCustomer.getEmail(), subject, message);
+
+            return ResponseEntity.ok(updatedCustomer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Cập nhật thất bại: " + e.getMessage()));
+        }
     }
 
     // Xóa khách hàng theo ID

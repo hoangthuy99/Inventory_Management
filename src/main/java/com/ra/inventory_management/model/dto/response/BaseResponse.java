@@ -16,4 +16,7 @@ public class BaseResponse<T> {
             this.code = code;
             this.message = message;
         }
+
+    public BaseResponse(Integer o, T message) {
+    }
 }

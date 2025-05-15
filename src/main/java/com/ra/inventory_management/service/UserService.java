@@ -28,9 +28,5 @@ public interface UserService {
 
     Users update(RegisterRequest request, Long id);
 
-    Optional<Users> findByUsername(String username);
-
-    List<Users> searchByName(String keyword);
-
 
 }

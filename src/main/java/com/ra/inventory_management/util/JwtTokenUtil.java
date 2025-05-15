@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 import java.security.InvalidParameterException;
 import java.security.Key;
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -34,21 +34,24 @@ public class JwtTokenUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", users.getEmail());
 
+        List<String> roles = users.getRoles().stream()
+                .map(role -> role.getRoleName().name()) // Lấy tên enum (VD: ADMIN, USER)
+                .toList();
+
         try {
-            String token = Jwts.builder()
+            return Jwts.builder()
                     .setClaims(claims)
                     .setSubject(users.getUsername())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignKey(), SignatureAlgorithm.HS256)
                     .compact();
-
-            return token;
         } catch (Exception e) {
-            // you can inject Logger, instead of System.out.println
             throw new InvalidParameterException("Can not create token, error: " + e.getMessage());
         }
     }
+
+
 
     public Key getSignKey() {
         byte[] bytes = Decoders.BASE64.decode(secretKey);
@@ -101,4 +104,6 @@ public class JwtTokenUtil {
         String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isExpired(token);
     }
+
+
 }

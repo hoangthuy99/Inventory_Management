@@ -1,41 +1,47 @@
 package com.ra.inventory_management.service;
 
-import com.ra.inventory_management.model.dto.UserDTO;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class EmailService {
-    @Autowired
-    private JavaMailSender javaMailSender;
 
-//    @KafkaListener(id = "email", topics = "spring-boot-topic")
-//    @Async
+    // Tiêm giá trị từ application.properties
+    @Value("${spring.mail.username}")
+    private String fromEmail;
 
-    public void sendEmail(UserDTO userDTO) {
+    private final JavaMailSender javaMailSender;
 
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom("hithuy98@gmail.com");
-        simpleMailMessage.setTo(userDTO.getEmail());
-        simpleMailMessage.setText("Cảm ơn " + userDTO.getUserName() + " đã đăng ký tài khoản thành công");
-        simpleMailMessage.setSubject("Thư cảm ơn");
-        javaMailSender.send(simpleMailMessage);
+    // Constructor injection cho JavaMailSender
+    public EmailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
     }
 
+    // Phương thức gửi email xác nhận tài khoản
     public void sendVerificationEmail(String email, String verificationCode) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("hithuy98@gmail.com");
+        message.setFrom(fromEmail);  // Sử dụng từ cấu hình
         message.setTo(email);
         message.setSubject("Xác nhận tài khoản");
         message.setText("Nhấp vào liên kết sau để xác nhận tài khoản: " +
                 "http://localhost:8080/app/auth/verify?code=" + verificationCode);
-        javaMailSender.send(message);
+        try {
+            javaMailSender.send(message);
+            System.out.println("Đã gửi thành công!");
+        } catch (Exception e) {
+            e.printStackTrace();  // In lỗi chi tiết
+        }
+    }
+
+    // Phương thức gửi email thông thường
+    public void sendEmail(String toEmail, String subject, String message) {
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom(fromEmail);  // Sử dụng từ cấu hình
+        simpleMailMessage.setTo(toEmail);
+        simpleMailMessage.setSubject(subject);
+        simpleMailMessage.setText(message);
+        javaMailSender.send(simpleMailMessage);
     }
 }
-

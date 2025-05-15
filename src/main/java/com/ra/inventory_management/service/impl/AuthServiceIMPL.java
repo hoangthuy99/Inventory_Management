@@ -115,6 +115,7 @@ public class AuthServiceIMPL implements AuthService {
                 .username(userGoogleExisted.getUsername())
                 .fullName(userGoogleExisted.getUsername())
                 .roles(List.of("ROLE_STAFF"))
+
                 .build();
     }
 

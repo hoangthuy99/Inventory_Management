@@ -59,6 +59,7 @@ public class OrderController {
     }
 
     // Lấy đơn hàng theo danh sách id
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("getByIdList")
     public ResponseEntity<?> getOrderByIdList(@RequestParam("ids") List<Long> ids) {
         List<Orders> orders = orderService.findByIdList(ids);

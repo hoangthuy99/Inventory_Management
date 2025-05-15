@@ -46,9 +46,7 @@ public class UserServiceIMPL implements UserService {
 
     @Override
     public Users handleRegister(RegisterRequest registerRequest) {
-        Logger logger = LoggerFactory.getLogger(getClass());
-
-        // Kiểm tra username và email đã tồn tại chưa
+        // Kiểm tra email và username đã tồn tại
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new IllegalArgumentException("Username đã tồn tại!");
         }
@@ -56,25 +54,26 @@ public class UserServiceIMPL implements UserService {
             throw new IllegalArgumentException("Email đã tồn tại!");
         }
 
+        // Khởi tạo đối tượng user
         Users user = new Users();
-        user.setUserCode(Users.generateUserCode()); // Mã user tự động tạo
+        user.setUserCode(Users.generateUserCode()); // Tạo mã user tự động
         user.setFullname(registerRequest.getFullname());
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPhone(registerRequest.getPhone());
         user.setAddress(registerRequest.getAddress());
-        user.setActiveFlag(0); // Đánh dấu chưa kích hoạt
+        user.setActiveFlag(0); // Chưa kích hoạt
 
         // Mã hóa mật khẩu
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        // Lấy vai trò mặc định
+        // Tìm vai trò mặc định
         Roles role = roleRepository.findByRoleName(ERoles.ROLE_STAFF);
         if (role == null) {
             throw new IllegalArgumentException("Không tìm thấy vai trò mặc định!");
         }
 
-        // Gán quyền mặc định
+        // Gán vai trò cho người dùng
         List<Roles> defaultRoles = new ArrayList<>();
         defaultRoles.add(role);
         user.setRoles(defaultRoles);
@@ -84,6 +83,7 @@ public class UserServiceIMPL implements UserService {
         user.setVerificationCode(verificationCode); // Lưu mã xác nhận vào user
 
         try {
+            // Lưu user vào database
             userRepository.save(user);
 
             // Gửi email xác nhận
@@ -91,7 +91,6 @@ public class UserServiceIMPL implements UserService {
 
             return user;
         } catch (DataIntegrityViolationException e) {
-            logger.error("Lỗi khi lưu user: " + e.getRootCause().getMessage());
             throw new IllegalArgumentException("Lỗi khi lưu user: " + e.getRootCause().getMessage());
         }
     }
@@ -135,39 +134,42 @@ public class UserServiceIMPL implements UserService {
     @Override
     public Users update(RegisterRequest request, Long id) {
         Users userOld = findById(id);
+
+        // Kiểm tra sự thay đổi của email
+        if (request.getEmail() != null && !request.getEmail().equals(userOld.getEmail())) {
+            // Nếu email thay đổi, kiểm tra sự tồn tại của email mới
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new RuntimeException("Email đã tồn tại");
+            }
+        }
+        // Kiểm tra username chỉ khi có sự thay đổi
         if (!request.getUsername().equals(userOld.getUsername())) {
             if (userRepository.existsByUsername(request.getUsername())) {
-                throw new RuntimeException("Username is exists");
+                throw new RuntimeException("Username đã tồn tại");
             }
         }
 
-        Roles roles = roleRepository.findById(request.getRoleId()).
-                orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại vai trò với id: " + request.getRoleId()));
+        // Chỉ cập nhật các trường nếu chúng có thay đổi
+        userOld.setFullname(request.getFullname());
+        userOld.setAddress(request.getAddress());
+        userOld.setPhone(request.getPhone());
+        userOld.setActiveFlag(request.getActiveFlag());
+
+        // Không thay đổi email nếu không cần
+        // userOld.setEmail(request.getEmail()); // Bỏ qua dòng này để giữ nguyên email nếu không thay đổi
+
+        Roles roles = roleRepository.findById(request.getRoleId())
+                .orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại"));
 
         List<Roles> rolesExits = userOld.getRoles();
         rolesExits.removeAll(userOld.getRoles());
         rolesExits.add(roles);
 
-
-        userOld.setFullname(request.getFullname());
-        userOld.setAddress(request.getAddress());
-        userOld.setPhone(request.getPhone());
-        userOld.setEmail(request.getEmail());
-        userOld.setActiveFlag(request.getActiveFlag());
         userOld.setRoles(rolesExits);
 
         return userRepository.save(userOld);
     }
 
-    @Override
-    public Optional<Users> findByUsername(String username) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Users> searchByName(String keyword) {
-        return null;
-    }
 
 
 }

@@ -25,6 +25,8 @@ public class MenuRequest {
 
     private Long parentId;
 
+    private Boolean showInSidebar = true;
+
     private Integer activeFlag = 1;
 
     private List<Long> roleIds;

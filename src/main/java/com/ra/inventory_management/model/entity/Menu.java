@@ -43,6 +43,8 @@ public class Menu {
     @Column(name = "parent_id")
     private Long parentId; // Function cha (nếu có)
 
+    private Boolean showInSidebar; // Hiển thị trong sidebar hay không
+
     @Column(name = "active_fg", nullable = false)
     private Integer activeFlag = 1; // Trạng thái kích hoạt
 

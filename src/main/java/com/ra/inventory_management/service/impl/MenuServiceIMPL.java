@@ -72,6 +72,7 @@ public class MenuServiceIMPL implements MenuService {
        menu.setIcon(request.getIcon());
        menu.setParentId(request.getParentId());
        menu.setActiveFlag(request.getActiveFlag());
+       menu.setShowInSidebar(request.getShowInSidebar());
        menu.setRoles(roles); // Assign roles to the menu
 
        return menuRepository.save(menu);
@@ -90,6 +91,7 @@ public class MenuServiceIMPL implements MenuService {
         menu.setIcon(request.getIcon());
         menu.setParentId(request.getParentId());
         menu.setActiveFlag(request.getActiveFlag());
+        menu.setShowInSidebar(request.getShowInSidebar());
         menu.setUpdatedDate(LocalDateTime.now());
 
         // Xử lý danh sách roleIds

@@ -1,6 +1,8 @@
 package com.ra.inventory_management.filter;
 
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.ra.inventory_management.model.entity.UserGoogle;
 import com.ra.inventory_management.model.entity.Users;
 import com.ra.inventory_management.reponsitory.UserGoogleRepository;
@@ -39,10 +41,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private UserGoogleRepository userGoogleRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
         try {
+            // Bỏ qua các endpoint không cần xác thực token
             if (isBypassToken(request)) {
-                filterChain.doFilter(request, response); // enable bypass
+                filterChain.doFilter(request, response);
                 return;
             }
 
@@ -57,37 +62,53 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             final String username = jwtTokenUtil.extractUsername(authToken);
             final String email = jwtTokenUtil.extractEmail(authToken);
 
-            if (username != null &&
-                    SecurityContextHolder.getContext().getAuthentication() == null) {
+            // Nếu chưa có xác thực
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserGoogle userGoogle = userGoogleRepository.findByEmail(email).orElse(null);
+                // Kiểm tra xem có phải là người dùng đăng nhập qua Firebase
+                if (request.getServletPath().startsWith("/app/auth/oauth-login")) {
+                    try {
+                        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authToken);
+                        String firebaseUid = decodedToken.getUid();
 
-                if (userGoogle != null) {
-                    filterChain.doFilter(request, response);
+                        // Kiểm tra nếu người dùng đã tồn tại trong hệ thống của bạn
+                        UserGoogle userGoogle = userGoogleRepository.findByEmail(email).orElse(null);
+                        if (userGoogle != null) {
+                            // Nếu có user Google, cho phép tiếp tục
+                            filterChain.doFilter(request, response);
+                            return;
+                        }
+                    } catch (Exception e) {
+                        // Nếu không xác thực được token Firebase
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase Token");
+                        return;
+                    }
                 }
 
+                // Nếu là user bình thường (JWT token)
                 Users userDetails = (Users) userDetailsService.loadUserByUsername(username);
-
                 if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
+                                    userDetails, null, userDetails.getAuthorities()
                             );
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 } else {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    return;
                 }
             }
-            filterChain.doFilter(request, response); // enable bypass
+
+            // Cuối cùng cho phép tiếp tục
+            filterChain.doFilter(request, response);
 
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
-
     }
+
+
 
     private boolean isBypassToken(@NotNull HttpServletRequest request) {
         final List<Pair<String, String>> bypassTokens = Arrays.asList(

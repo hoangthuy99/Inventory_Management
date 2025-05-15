@@ -74,6 +74,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/app/auth/**", "/uploads/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll()
                         .requestMatchers("/app/menu/getMenuByUser").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/app/auth/oauth-login", "/app/auth/oauth-register").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -85,14 +86,14 @@ public class WebSecurityConfig {
     @Order(2)
     public SecurityFilterChain oauth2SecurityFilter(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/app/auth/oauth-login") // hoặc toàn bộ các route yêu cầu token từ Google
+                .securityMatcher("/app/auth/oauth-login") // Chỉ áp dụng cho OAuth2 login
                 .csrf(CsrfConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfiguration()))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()) // Để cấu hình authorities từ JWT
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()) // Ánh xạ authorities từ Google token
                 ))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/app/auth/oauth-login").permitAll()
+                        .requestMatchers("/app/auth/oauth-login").permitAll() // Cho phép tất cả truy cập để xác thực
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -100,7 +101,6 @@ public class WebSecurityConfig {
 
         return http.build();
     }
-
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();

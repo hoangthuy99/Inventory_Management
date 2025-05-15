@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Table(name = "customer")
 @Getter
@@ -49,6 +50,10 @@ public class Customer {
     @PreUpdate
     protected void onUpdate() {
         updateDate = LocalDateTime.now();
+    }
+
+    public static String generateOrderCode() {
+        return "CS" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8).toUpperCase();
     }
 }
 
