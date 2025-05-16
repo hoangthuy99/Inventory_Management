@@ -1,8 +1,6 @@
 package com.ra.inventory_management.filter;
 
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseToken;
 import com.ra.inventory_management.model.entity.UserGoogle;
 import com.ra.inventory_management.model.entity.Users;
 import com.ra.inventory_management.reponsitory.UserGoogleRepository;
@@ -43,9 +41,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
         try {
-            // Bỏ qua các endpoint không cần xác thực token
+            // Cho phép bypass một số URL
             if (isBypassToken(request)) {
                 filterChain.doFilter(request, response);
                 return;
@@ -65,27 +62,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // Nếu chưa có xác thực
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                // Kiểm tra xem có phải là người dùng đăng nhập qua Firebase
+                // Nếu là user đăng nhập bằng Google
                 if (request.getServletPath().startsWith("/app/auth/oauth-login")) {
-                    try {
-                        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authToken);
-                        String firebaseUid = decodedToken.getUid();
-
-                        // Kiểm tra nếu người dùng đã tồn tại trong hệ thống của bạn
-                        UserGoogle userGoogle = userGoogleRepository.findByEmail(email).orElse(null);
-                        if (userGoogle != null) {
-                            // Nếu có user Google, cho phép tiếp tục
-                            filterChain.doFilter(request, response);
-                            return;
-                        }
-                    } catch (Exception e) {
-                        // Nếu không xác thực được token Firebase
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase Token");
+                    UserGoogle userGoogle = userGoogleRepository.findByEmail(email).orElse(null);
+                    if (userGoogle != null) {
+                        // Có user google, cho qua
+                        filterChain.doFilter(request, response);
                         return;
                     }
                 }
 
-                // Nếu là user bình thường (JWT token)
+                // Nếu là user bình thường
                 Users userDetails = (Users) userDetailsService.loadUserByUsername(username);
                 if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
@@ -100,14 +87,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
             }
 
-            // Cuối cùng cho phép tiếp tục
+            // Cuối cùng cho qua
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
     }
-
 
 
     private boolean isBypassToken(@NotNull HttpServletRequest request) {

@@ -42,6 +42,13 @@ public class EmailService {
         simpleMailMessage.setTo(toEmail);
         simpleMailMessage.setSubject(subject);
         simpleMailMessage.setText(message);
-        javaMailSender.send(simpleMailMessage);
+
+        try {
+            javaMailSender.send(simpleMailMessage);
+            System.out.println("Email đã được gửi thành công tới: " + toEmail);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi gửi email tới " + toEmail + ": " + e.getMessage());
+            e.printStackTrace();  // In stack trace đầy đủ để debug
+        }
     }
 }

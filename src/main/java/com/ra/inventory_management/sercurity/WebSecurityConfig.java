@@ -74,7 +74,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/app/auth/**", "/uploads/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll()
                         .requestMatchers("/app/menu/getMenuByUser").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers("/app/auth/oauth-login", "/app/auth/oauth-register").permitAll()
+                        .requestMatchers( "/app/auth/oauth-register").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

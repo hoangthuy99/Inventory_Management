@@ -8,12 +8,17 @@ import com.ra.inventory_management.model.entity.Supplier;
 import com.ra.inventory_management.reponsitory.SupplierRepository;
 import com.ra.inventory_management.service.EmailService;
 import com.ra.inventory_management.service.SupplierService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +38,7 @@ public class SupplierController {
     private SupplierService supplierService;
     @Autowired
     private EmailService emailService;
+    private static final Logger logger = LoggerFactory.getLogger(SupplierController.class);
 
     @GetMapping("getAllSuppliers")
     public ResponseEntity<?> getAllSuppliers() {
@@ -49,6 +55,7 @@ public class SupplierController {
     }
 
     // API lấy danh mục theo ID
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getSupplierById(@PathVariable Integer id) {
         Optional<Supplier> supplier = supplierService.findById(id);
@@ -57,13 +64,16 @@ public class SupplierController {
         }
         return ResponseEntity.ok(supplier);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @PostMapping("addSupplier")
     public ResponseEntity<?> addSupplier(@RequestBody SupplierRequest supplierRequest) {
+        logger.info("Nhận yêu cầu thêm supplier với email: {}", supplierRequest.getEmail());
+
         try {
             // Kiểm tra và set giá trị mặc định cho activeFlag nếu không có
             if (supplierRequest.getActiveFlag() == null) {
                 supplierRequest.setActiveFlag(1);
+                logger.debug("Đặt activeFlag mặc định là 1 cho supplier.");
             }
 
             // Chuyển đổi SupplierRequest thành entity Supplier
@@ -78,76 +88,113 @@ public class SupplierController {
 
             // Lưu thông tin nhà cung cấp vào cơ sở dữ liệu
             Supplier savedSupplier = supplierService.save(supplier);
+            logger.info("Thêm supplier thành công với email: {}", savedSupplier.getEmail());
 
             // Gửi email chào mừng nhà cung cấp mới
-            String subject = "Chào mừng bạn đến với hệ thống của chúng tôi!";
-            String message = "Cảm ơn bạn đã đăng ký với hệ thống của chúng tôi. Mã nhà cung cấp của bạn là: " + generatedCode;
-            emailService.sendEmail(supplier.getEmail(), subject, message);
+            try {
+                String subject = "Chào mừng bạn đến với hệ thống của chúng tôi!";
+                String message = "Cảm ơn bạn đã đăng ký với hệ thống của chúng tôi. Mã nhà cung cấp của bạn là: " + generatedCode;
+                emailService.sendEmail(supplier.getEmail(), subject, message);
+                logger.info("Gửi email chào mừng thành công cho: {}", supplier.getEmail());
+            } catch (Exception emailException) {
+                logger.error("Gửi email thất bại: {}", emailException.getMessage());
+            }
 
             // Trả về thông tin nhà cung cấp vừa thêm vào
             return ResponseEntity.ok(savedSupplier);
+
+        } catch (DataIntegrityViolationException e) {
+            logger.warn("Lỗi trùng email: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("error", "Email '" + supplierRequest.getEmail() + "' đã tồn tại!"));
         } catch (IllegalArgumentException e) {
+            logger.warn("Lỗi tham số không hợp lệ: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Collections.singletonMap("error", e.getMessage()));
         } catch (Exception e) {
+            logger.error("Lỗi hệ thống: {}", e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Lỗi hệ thống, vui lòng thử lại sau!"));
+                    .body(Collections.singletonMap("error", "Lỗi hệ thống: " + e.getMessage()));
         }
     }
 
-
-    //  API cập nhật danh mục
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateSupplier(@PathVariable Integer id, @RequestBody SupplierRequest supplierRequest) {
+        logger.info("Nhận yêu cầu cập nhật supplier với ID: {}", id);
+
         if (supplierRequest == null) {
+            logger.warn("Dữ liệu yêu cầu không hợp lệ!");
             return ResponseEntity.badRequest().body("Dữ liệu yêu cầu không hợp lệ!");
         }
 
         Optional<Supplier> existingSupplier = supplierService.findById(id);
         if (existingSupplier.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
+            logger.warn("Không tìm thấy supplier với ID: {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy nhà cung cấp");
         }
 
-        Supplier supplier = existingSupplier.get();  // Lấy object từ Optional
+        Supplier supplier = existingSupplier.get();
         supplier.setName(supplierRequest.getName());
         supplier.setAddress(supplierRequest.getAddress());
         supplier.setPhone(supplierRequest.getPhone());
         supplier.setEmail(supplierRequest.getEmail());
         supplier.setActiveFlag(supplierRequest.getActiveFlag());
 
-        supplierService.save(supplier);
-
-        //  Gửi email thông báo đã cập nhật thông tin
         try {
-            String subject = "Thông tin nhà cung cấp đã được cập nhật";
-            String message = "Chào bạn,\n\nThông tin nhà cung cấp của bạn đã được cập nhật trong hệ thống.\n\n" +
-                    "Tên: " + supplier.getName() + "\n" +
-                    "Địa chỉ: " + supplier.getAddress() + "\n" +
-                    "Số điện thoại: " + supplier.getPhone() + "\n\n" +
-                    "Trân trọng,\nHệ thống quản lý kho.";
-            emailService.sendEmail(supplier.getEmail(), subject, message);
+            supplierService.save(supplier);
+            logger.info("Cập nhật supplier thành công với email: {}", supplier.getEmail());
+
+            // Gửi email thông báo đã cập nhật thông tin
+            try {
+                String subject = "Thông tin nhà cung cấp đã được cập nhật";
+                String message = "Chào bạn,\n\nThông tin nhà cung cấp của bạn đã được cập nhật trong hệ thống.\n\n" +
+                        "Tên: " + supplier.getName() + "\n" +
+                        "Địa chỉ: " + supplier.getAddress() + "\n" +
+                        "Số điện thoại: " + supplier.getPhone() + "\n\n" +
+                        "Trân trọng,\nHệ thống quản lý kho.";
+                emailService.sendEmail(supplier.getEmail(), subject, message);
+                logger.info("Gửi email thông báo thành công cho: {}", supplier.getEmail());
+            } catch (Exception emailException) {
+                logger.error("Gửi email thất bại: {}", emailException.getMessage());
+            }
+
+            return ResponseEntity.ok(supplier);
+
+        } catch (DataIntegrityViolationException e) {
+            logger.warn("Lỗi trùng email khi cập nhật: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("error", "Email '" + supplierRequest.getEmail() + "' đã tồn tại!"));
         } catch (Exception e) {
-            // Nếu gửi mail lỗi, ghi log nhưng vẫn trả về thành công
-            System.err.println("Gửi email thất bại: " + e.getMessage());
+            logger.error("Lỗi hệ thống khi cập nhật: {}", e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Lỗi hệ thống: " + e.getMessage()));
         }
-
-        return ResponseEntity.ok(supplier);
     }
-
-    //  API xóa danh mục
+    //  API xóa
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
-        Optional<Supplier> supplier = supplierService.findById(id);
+        logger.info("Nhận yêu cầu xóa supplier với ID: {}", id);
 
-        if (supplier.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Supplier not found");
+        try {
+            supplierService.delete(id);
+            return ResponseEntity.ok("Supplier deleted successfully");
+        } catch (EntityNotFoundException e) {
+            logger.warn("Không tìm thấy supplier để xóa: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Lỗi hệ thống khi xóa: {}", e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Lỗi hệ thống: " + e.getMessage()));
         }
-
-        supplierService.delete(id);
-        return ResponseEntity.ok("Supplier deleted successfully");
     }
 
     // API import file excel
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @PostMapping(value = "importExcel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> importExcel(@RequestParam("file") MultipartFile file) throws IOException {
         List<Supplier> response = supplierService.importExcel(file);

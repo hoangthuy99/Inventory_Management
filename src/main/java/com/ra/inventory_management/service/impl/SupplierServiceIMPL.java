@@ -2,16 +2,19 @@ package com.ra.inventory_management.service.impl;
 
 import com.ra.inventory_management.common.Constant;
 import com.ra.inventory_management.model.dto.request.SearchRequest;
-import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.Supplier;
 import com.ra.inventory_management.reponsitory.SupplierRepository;
 import com.ra.inventory_management.service.SupplierService;
 import com.ra.inventory_management.util.ExcelUtil;
 import com.ra.inventory_management.util.PageableUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ public class SupplierServiceIMPL implements SupplierService {
 
     @Autowired
     private ExcelUtil excelUtil;
+    private static final Logger logger = LoggerFactory.getLogger(SupplierServiceIMPL.class);
 
     @Override
     public List<Supplier> getAll() {
@@ -43,17 +47,35 @@ public class SupplierServiceIMPL implements SupplierService {
 
     @Override
     public Supplier save(Supplier supplier) {
-        return supplierRepository.save(supplier);
+        if (supplier.getEmail() != null) {
+            logger.info("Kiểm tra email tồn tại: {}", supplier.getEmail());
+            if (supplierRepository.existsByEmailAndActiveFlag(supplier.getEmail(), 1)) {
+                logger.warn("Email đã tồn tại: {}", supplier.getEmail());
+                throw new DataIntegrityViolationException("Email '" + supplier.getEmail() + "' đã tồn tại!");
+            }
+        }
+        Supplier savedSupplier = supplierRepository.save(supplier);
+        logger.info("Lưu supplier thành công: {}", savedSupplier.getEmail());
+        return savedSupplier;
     }
 
     @Override
     public Optional<Supplier> findById(Integer id) {
-        return supplierRepository.findById(id);
+        return supplierRepository.findByIdAndActiveFlag(id, 1);
     }
 
     @Override
     public void delete(Integer id) {
-        supplierRepository.deleteById(id);
+        Optional<Supplier> supplierOpt = supplierRepository.findByIdAndActiveFlag(id, 1);
+        if (supplierOpt.isPresent()) {
+            Supplier supplier = supplierOpt.get();
+            supplier.setActiveFlag(0); // Đánh dấu xóa mềm
+            supplierRepository.save(supplier);
+            logger.info("Đánh dấu xóa mềm supplier với ID: {}", id);
+        } else {
+            logger.warn("Không tìm thấy supplier với ID: {}", id);
+            throw new EntityNotFoundException("Không tìm thấy nhà cung cấp với ID: " + id);
+        }
     }
 
 

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
     @Query("""
@@ -26,4 +28,8 @@ public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
             @Param("status") Integer status,
             Pageable pageable
     );
+
+    boolean existsByEmailAndActiveFlag(String email, Integer activeFlag);
+
+    Optional<Supplier> findByIdAndActiveFlag(Integer id, Integer activeFlag);
 }

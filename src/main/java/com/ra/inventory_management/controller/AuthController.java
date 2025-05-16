@@ -149,9 +149,13 @@ public class AuthController {
 
             // Tạo JWT có chứa claim roles
             String newToken = jwtTokenUtil.generateToken(user);
+            Map<String, Object> result = new HashMap<>();
+            result.put("accessToken", newToken);
+            result.put("code", user.getUserCode()); // Đây là mã shipper
 
-            // Trả về token
-            return ResponseEntity.ok(new BaseResponse<>(newToken));
+            return ResponseEntity.ok(new BaseResponse<>(result));
+
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new BaseResponse<String>(null, "Failed to process OAuth login: " + e.getMessage()));
