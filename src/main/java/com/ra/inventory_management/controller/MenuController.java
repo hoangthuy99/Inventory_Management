@@ -60,7 +60,7 @@ public class MenuController {
         return ResponseEntity.ok(menus);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @GetMapping("getMenuByUser")
     public ResponseEntity<List<Menu>> getMenuByUser() {
         List<Menu> menus = menuService.getMenuByUser();

@@ -1,5 +1,6 @@
 package com.ra.inventory_management.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -8,18 +9,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    // Tiêm giá trị từ application.properties
+    @Autowired
+    private JavaMailSender javaMailSender;
     @Value("${spring.mail.username}")
-    private String fromEmail;
+    private String fromEmail;  // Địa chỉ email gửi đi
 
-    private final JavaMailSender javaMailSender;
+    public void sendEmail(String toEmail, String subject, String message) {
+        String fromEmail = "hithuy98@gmail.com";
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom(fromEmail);
+        simpleMailMessage.setTo(toEmail);
+        simpleMailMessage.setSubject(subject);
+        simpleMailMessage.setText(message);
 
-    // Constructor injection cho JavaMailSender
-    public EmailService(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
+        try {
+            javaMailSender.send(simpleMailMessage);
+            System.out.println("Email đã được gửi thành công tới: " + toEmail);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi gửi email tới " + toEmail + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-
-    // Phương thức gửi email xác nhận tài khoản
     public void sendVerificationEmail(String email, String verificationCode) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);  // Sử dụng từ cấu hình
@@ -35,20 +45,5 @@ public class EmailService {
         }
     }
 
-    // Phương thức gửi email thông thường
-    public void sendEmail(String toEmail, String subject, String message) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom(fromEmail);  // Sử dụng từ cấu hình
-        simpleMailMessage.setTo(toEmail);
-        simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setText(message);
 
-        try {
-            javaMailSender.send(simpleMailMessage);
-            System.out.println("Email đã được gửi thành công tới: " + toEmail);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi gửi email tới " + toEmail + ": " + e.getMessage());
-            e.printStackTrace();  // In stack trace đầy đủ để debug
-        }
-    }
 }

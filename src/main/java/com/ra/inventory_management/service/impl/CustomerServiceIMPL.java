@@ -1,11 +1,14 @@
 package com.ra.inventory_management.service.impl;
 
 import com.ra.inventory_management.common.Constant;
+import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.Customer;
 import com.ra.inventory_management.reponsitory.CustomerRepository;
 import com.ra.inventory_management.service.CustomerService;
 import com.ra.inventory_management.util.ExcelUtil;
+import com.ra.inventory_management.util.PageableUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,8 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,7 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.*;
-
+@Slf4j
 @Service
 public class CustomerServiceIMPL implements CustomerService {
     @Autowired
@@ -53,8 +59,16 @@ public class CustomerServiceIMPL implements CustomerService {
     }
 
     @Override
-    public List<Customer> searchByName(String keyword) {
-        return customerRepository.searchByName(keyword);
+    public Page<Customer> searchCus(SearchRequest request) {
+        log.info("start: searchCustomer");
+
+        Pageable pageable = PageableUtil.create(request.getPageNum(), request.getPageSize(), request.getSortBy(), request.getSortType());
+
+        Page<Customer> customerPage = customerRepository.searchCustomer(request.getSearchKey(), request.getStatus(), pageable);
+
+        log.info("end: searchCustomer");
+
+        return customerPage;
     }
 
     @Override

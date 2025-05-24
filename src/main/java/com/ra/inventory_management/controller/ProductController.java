@@ -46,7 +46,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @GetMapping("/{id}")
     public ResponseEntity<ProductInfo> getProductById(@PathVariable Long id) {
         ProductInfo product = productService.findById(id);
@@ -56,7 +56,7 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> products = productService.getAll()
@@ -66,7 +66,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @GetMapping("/uploads/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) throws MalformedURLException {
         Path file = Paths.get("uploads").resolve(filename);
@@ -74,7 +74,7 @@ public class ProductController {
         return ResponseEntity.ok().body(resource);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @PostMapping(
             value = "add-product",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE

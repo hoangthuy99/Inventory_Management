@@ -1,6 +1,8 @@
 package com.ra.inventory_management.service;
 
+import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.entity.Customer;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -17,7 +19,7 @@ public interface CustomerService {
 
     void delete(Long id);
 
-    List<Customer> searchByName(String keyword);
+    Page<Customer> searchCus(SearchRequest request);
 
     List<Customer> importExcel(MultipartFile file) throws IOException;
 

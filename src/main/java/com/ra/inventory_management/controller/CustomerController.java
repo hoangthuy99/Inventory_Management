@@ -1,13 +1,14 @@
 package com.ra.inventory_management.controller;
 
 
-import com.ra.inventory_management.model.dto.request.CustomerRequest;
+import com.ra.inventory_management.model.dto.request.SearchRequest;
 import com.ra.inventory_management.model.dto.response.BaseResponse;
-import com.ra.inventory_management.model.entity.Categories;
 import com.ra.inventory_management.model.entity.Customer;
 import com.ra.inventory_management.service.CustomerService;
 import com.ra.inventory_management.service.EmailService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class CustomerController {
 
     // Lấy danh sách tất cả khách hàng
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
+    public ResponseEntity<List<Customer>> getCustomer() {
         List<Customer> customers = customerService.getAll();
         return ResponseEntity.ok(customers);
     }
@@ -111,11 +112,13 @@ public class CustomerController {
     }
 
     // Tìm kiếm khách hàng theo tên
-    @GetMapping("/search")
-    public ResponseEntity<List<Customer>> searchCustomers(@RequestParam String keyword) {
-        List<Customer> customers = customerService.searchByName(keyword);
-        return ResponseEntity.ok(customers);
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PostMapping("searchCus")
+    public ResponseEntity<?> searchCus(@Valid @RequestBody SearchRequest request) {
+        Page<Customer> customer = customerService.searchCus(request);
+        return ResponseEntity.ok().body(new BaseResponse<>(customer));
     }
+
 
     // API import file excel
     @PostMapping(value = "importExcel", produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})

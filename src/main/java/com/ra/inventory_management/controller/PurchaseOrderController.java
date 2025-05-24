@@ -20,14 +20,14 @@ public class PurchaseOrderController {
     private PurchaseOrderService purchaseOrderService;
 
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @PostMapping("createPurchaseOrder")
     public ResponseEntity<?> createPurchaseOrder(@RequestBody PurchaseOrderRequest request) {
         PurchaseOrder purchaseOrder = purchaseOrderService.createPurchaseOrder(request);
         return ResponseEntity.ok().body(new BaseResponse<>(purchaseOrder));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @PutMapping("updatePurchaseOrder")
     public ResponseEntity<?> updatePurchaseOrder(@RequestBody PurchaseOrderRequest request) {
         PurchaseOrder purchaseOrder = purchaseOrderService.updatePurchaseOrder(request);

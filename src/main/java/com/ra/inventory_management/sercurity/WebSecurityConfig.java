@@ -73,7 +73,7 @@ public class WebSecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/app/auth/**", "/uploads/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll()
-                        .requestMatchers("/app/menu/getMenuByUser").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/app/menu/getMenuByUser").hasAnyRole("ADMIN", "STAFF","MANAGER","ACCOUNTANT")
                         .requestMatchers( "/app/auth/oauth-register").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)

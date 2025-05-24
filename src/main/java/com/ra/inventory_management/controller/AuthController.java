@@ -43,12 +43,11 @@ public class AuthController {
     @Autowired
     private AuthServiceIMPL authService;
 
-    private final RoleService roleService;
+
 
     @Autowired
     private UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserGoogleRepository userGoogleRepository;

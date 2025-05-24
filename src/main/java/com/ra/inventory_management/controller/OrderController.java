@@ -26,7 +26,7 @@ public class OrderController {
 
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     public ResponseEntity<List<Orders>> getAll(@RequestParam(required = false) Long customerId) {
         if (customerId != null) {
             return ResponseEntity.ok(orderService.getAllByCus(customerId));
@@ -34,7 +34,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAll());
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @PostMapping("/createOrder")
     public ResponseEntity<?> saveOrder(@RequestBody OrderRequest orderRequest) {
         System.out.println("Dữ liệu nhận được: " + orderRequest);
@@ -42,7 +42,7 @@ public class OrderController {
         return ResponseEntity.ok().body(new BaseResponse<>(savedOrder));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @PutMapping("/updateOrder")
     public ResponseEntity<?> updateOrder(@RequestBody OrderRequest request) {
         Orders order = orderService.update(request);
@@ -59,7 +59,7 @@ public class OrderController {
     }
 
     // Lấy đơn hàng theo danh sách id
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     @GetMapping("getByIdList")
     public ResponseEntity<?> getOrderByIdList(@RequestParam("ids") List<Long> ids) {
         List<Orders> orders = orderService.findByIdList(ids);

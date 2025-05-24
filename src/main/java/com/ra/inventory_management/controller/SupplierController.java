@@ -55,7 +55,7 @@ public class SupplierController {
     }
 
     // API lấy danh mục theo ID
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getSupplierById(@PathVariable Integer id) {
         Optional<Supplier> supplier = supplierService.findById(id);
@@ -64,7 +64,7 @@ public class SupplierController {
         }
         return ResponseEntity.ok(supplier);
     }
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @PostMapping("addSupplier")
     public ResponseEntity<?> addSupplier(@RequestBody SupplierRequest supplierRequest) {
         logger.info("Nhận yêu cầu thêm supplier với email: {}", supplierRequest.getEmail());
@@ -119,7 +119,7 @@ public class SupplierController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateSupplier(@PathVariable Integer id, @RequestBody SupplierRequest supplierRequest) {
         logger.info("Nhận yêu cầu cập nhật supplier với ID: {}", id);
